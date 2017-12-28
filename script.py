@@ -19,13 +19,13 @@ import dash_html_components as html
 from pandas_datareader import data as web
 from datetime import datetime as dt
 
-# Authentication
+# Authentication ----------------------------------------------------------------
 
 kraken = krakenex.API()
 kraken.load_key('<your_path>\kraken.key.txt') # to download on Kraken
 
 
-# Collecting data - all cryptocurrencies
+# Collecting data - all cryptocurrencies ----------------------------------------------------------------
 
 interval_in_minutes = '1440'
 result_ohlc = pd.DataFrame(columns=['asset','time', 'open_price','close_price','volume'])
@@ -85,4 +85,98 @@ for k in range(0,len(assetPairs)):
     else :
         print(time.strftime('%Y-%m-%d %H:%M:%S')+ ' : '+'data not collected for asset '+ asset_k)
 
-print(time.strftime('%Y-%m-%d %H:%M:%S')+ ' : ' + 'no more data to collect from Kraken')        
+print(time.strftime('%Y-%m-%d %H:%M:%S')+ ' : ' + 'no more data to collect from Kraken')    
+
+
+# Visualizing data with a Dash app - opening price and volume ----------------------------------------------------------------
+
+app = dash.Dash('Kraken World')
+
+dropdown_options = []
+assets.sort()
+for j in range(0,len(assets)):
+    dropdown_options.append(dict([('label', assets[j]), ('value', assets[j])]))
+
+measure_options = []
+measures = ['open_price','volume']
+for l in range(0,len(measures)):
+    measure_options.append(dict([('label', measures[l]), ('value', measures[l])]))    
+    
+    
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF',
+    'text_dropdowns' : '#F9FBFC'
+}
+
+app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
+    html.Label(children='Select your asset pair',style={'color':colors['text_dropdowns']}),
+    dcc.Dropdown(
+        id='asset_choice',
+        options=dropdown_options,
+        value='XXBTZEUR'
+    ),  
+    
+    html.Label(children='Select your KPI',style={'color':colors['text_dropdowns']}),
+    dcc.Dropdown(
+        id='measure_choice',
+        options=measure_options,
+        value='open_price'
+    ),  
+    
+    html.H1(
+        children='Cryptocurrencies on Kraken',
+        style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }
+    ),
+
+    html.Div(children='Using Kraken API to collect data about cryptocurrencies', style={
+        'textAlign': 'center',
+        'color': colors['text']
+    }),
+    
+    dcc.Graph(
+        id='graph_1',
+        figure={
+            'data': [{'x':result_ohlc['time'],
+                      'y':result_ohlc['open_price']
+                      }],
+            'layout': {
+                'plot_bgcolor': colors['background'],
+                'paper_bgcolor': colors['background'],
+                'font': {
+                    'color': colors['text']
+                }
+            }
+        }
+    ) 
+    
+])
+
+
+@app.callback(
+    dash.dependencies.Output('graph_1', 'figure'),
+    [dash.dependencies.Input('asset_choice', 'value'),
+     dash.dependencies.Input('measure_choice', 'value')])    
+def update_graph(selected_asset,selected_measure):
+    filtered_df = result_ohlc[result_ohlc.asset == selected_asset]
+    return {
+        'data': [{'x':filtered_df['time'],
+                  'y':filtered_df[selected_measure],
+                  'name': 'Open price'
+                  }
+                ],
+        'layout': {
+                'plot_bgcolor': colors['background'],
+                'paper_bgcolor': colors['background'],
+                'font': {
+                    'color': colors['text']
+                }
+        }
+    } 
+
+if __name__ == '__main__':
+    app.run_server(debug=False)
+
