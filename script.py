@@ -98,7 +98,7 @@ for j in range(0,len(assets)):
     dropdown_options.append(dict([('label', assets[j]), ('value', assets[j])]))
 
 measure_options = []
-measures = ['open_price','volume']
+measures = ['open_price','close_price','volume']
 for l in range(0,len(measures)):
     measure_options.append(dict([('label', measures[l]), ('value', measures[l])]))    
     
@@ -151,7 +151,18 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                 }
             }
         }
-    ) 
+    ),
+    
+    html.Label(children='Select your date range',style={'color':colors['text_dropdowns']}),
+    html.Div(
+    [
+    dcc.DatePickerRange(
+        id='date_picker_range',
+        start_date=dt.strptime(result_ohlc['time'].min(),"%Y-%m-%d %H:%M:%S"),
+        end_date=dt.strptime(result_ohlc['time'].max(),"%Y-%m-%d %H:%M:%S"),
+        end_date_placeholder_text='Select a date!'
+    )
+    ])
     
 ])
 
@@ -159,9 +170,13 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
 @app.callback(
     dash.dependencies.Output('graph_1', 'figure'),
     [dash.dependencies.Input('asset_choice', 'value'),
-     dash.dependencies.Input('measure_choice', 'value')])    
-def update_graph(selected_asset,selected_measure):
+     dash.dependencies.Input('measure_choice', 'value'),
+     dash.dependencies.Input('date_picker_range', 'start_date'),
+     dash.dependencies.Input('date_picker_range', 'end_date')])    
+def update_graph(selected_asset,selected_measure,selected_start_date,selected_end_date):
     filtered_df = result_ohlc[result_ohlc.asset == selected_asset]
+    filtered_df = filtered_df[filtered_df.time>=selected_start_date]
+    filtered_df = filtered_df[filtered_df.time<=selected_end_date]
     return {
         'data': [{'x':filtered_df['time'],
                   'y':filtered_df[selected_measure],
@@ -176,6 +191,7 @@ def update_graph(selected_asset,selected_measure):
                 }
         }
     } 
+
 
 if __name__ == '__main__':
     app.run_server(debug=False)
