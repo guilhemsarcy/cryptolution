@@ -1,13 +1,13 @@
 
 # Libs ----------------------------------------------------------------
 
-pip install krakenex
-pip install plotly==2.0.11 
-pip install dash==0.17.5 
-pip install dash_renderer 
-pip install dash_core_components 
-pip install dash_html_components 
-pip install pandas_datareader
+!pip install krakenex
+!pip install plotly==2.0.11 
+!pip install dash==0.17.5 
+!pip install dash_renderer 
+!pip install dash_core_components 
+!pip install dash_html_components 
+!pip install pandas_datareader
 
 import krakenex
 import time
