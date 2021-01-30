@@ -5,78 +5,74 @@ import dash
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
-from datetime import datetime as dt
+import datetime as dt
 
 
 kraken = krakenex.API()
-kraken.load_key('<your_path>/kraken.key.txt')
-
-
-# Collecting data - all cryptocurrencies ----------------------------------------------------------------
+kraken.load_key('../auth/kraken.key')
 
 interval_in_minutes = '1440'
 result_ohlc = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
 
 print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'starting to collect data from Kraken')
 
-
 ret = 0
-while ret == 0: 
+while ret == 0:
     try:
         print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'trying to collect the list of asset pairs')
-        assetPairs = kraken.query_public('AssetPairs', {'info': 'leverage'})
+        assetPairs = kraken.query_public('AssetPairs')
         ret = 1
     except ValueError:
         print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Kraken not available - retry after 5 sec')
         ret = 0
         time.sleep(5)
-assetPairs = assetPairs['result'].keys()
+assetPairs = assetPairs['result']
 assets = []
 print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'list of asset pairs collected')
+assetPairs = {'BCHEUR', 'XDGEUR'}
 
-
-for k in range(0, len(assetPairs)):
-    asset_k = assetPairs[k]
-    result_ohlc_asset_k = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
+for k, asset in enumerate(assetPairs):
+    current_asset = asset
+    current_result_ohlc_asset = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
 
     ret = 0
-    while ret == 0: 
+    while ret == 0:
         try:
-            query_ohlc_k = kraken.query_public('OHLC', {'pair': asset_k, 'interval': interval_in_minutes})
+            current_query_ohlc = kraken.query_public('OHLC', {'pair': current_asset, 'interval': interval_in_minutes})
             ret = 1
         except ValueError:
             print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Kraken not available ' + '- retry after 5 sec')
             ret = 0
             time.sleep(5)
-    print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'trying to collect data for asset ' + asset_k)
+    print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'trying to collect data for asset ' + current_asset)
 
     try:
-        error = query_ohlc_k['error'][0]
+        error = current_query_ohlc['error'][0]
     except IndexError:
         error = 'No error'
 
     if error == 'No error':
-        assets.append(asset_k)
-        data_ohlc_asset_k = query_ohlc_k['result'][asset_k] 
-        for i in range(0, len(data_ohlc_asset_k)):
-            asset_i = asset_k   # asset
-            time_i = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data_ohlc_asset_k[i][0]))  # period
-            open_price_i = data_ohlc_asset_k[i][1]   # price at the beginning of the period
-            close_price_i = data_ohlc_asset_k[i][4]  # price at the end of the period
-            volume_i = data_ohlc_asset_k[i][6]  # of shares traded
-            result_ohlc_asset_k.loc[i] = [asset_i, time_i, open_price_i, close_price_i, volume_i]
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : '+'data collected for asset ' + asset_k +
-              ' - current progress is ' + str(int(float(k + 1)/float(len(assetPairs)) * 100)) + '%')
-        result_ohlc = pd.concat([result_ohlc, result_ohlc_asset_k])
+        assets.append(current_asset)
+        current_data_ohlc_asset = current_query_ohlc['result'][current_asset]
+        for i in range(0, len(current_data_ohlc_asset)):
+            temp_asset = current_asset  # asset
+            temp_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_data_ohlc_asset[i][0]))  # period
+            temp_open_price = current_data_ohlc_asset[i][1]  # price at the beginning of the period
+            temp_close_price = current_data_ohlc_asset[i][4]  # price at the end of the period
+            temp_volume = current_data_ohlc_asset[i][6]  # number of shares traded
+            current_result_ohlc_asset.loc[i] = [temp_asset, temp_time, temp_open_price, temp_close_price, temp_volume]
+        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'data collected for asset ' + current_asset +
+              ' - current progress is ' + str(int(float(k + 1) / float(len(assetPairs)) * 100)) + '%')
+        result_ohlc = pd.concat([result_ohlc, current_result_ohlc_asset])
+
     else:
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : '+'data not collected for asset ' + asset_k)
+        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'data not collected for asset ' + current_asset)
 
 print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'no more data to collect from Kraken')
 
 # Dash App
 
 app = dash.Dash('Kraken World')
-server = app.server
 
 dropdown_options = []
 assets.sort()
@@ -87,8 +83,7 @@ measure_options = []
 measures = ['open_price', 'close_price', 'volume']
 for m in range(0, len(measures)):
     measure_options.append(dict([('label', measures[m]), ('value', measures[m])]))
-    
-    
+
 colors = {
     'background': '#111111',
     'text': '#7FDBFF',
@@ -101,15 +96,15 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         id='asset_choice',
         options=dropdown_options,
         value='XXBTZEUR'
-    ),  
-    
+    ),
+
     html.Label(children='Select your KPI', style={'color': colors['text_dropdowns']}),
     dcc.Dropdown(
         id='measure_choice',
         options=measure_options,
         value='open_price'
-    ),  
-    
+    ),
+
     html.H1(
         children='Cryptocurrencies on Kraken',
         style={
@@ -122,7 +117,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         'textAlign': 'center',
         'color': colors['text']
     }),
-    
+
     dcc.Graph(
         id='graph_1',
         figure={
@@ -138,16 +133,16 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             }
         }
     ),
-    
+
     html.Label(children='Select your date range', style={'color': colors['text_dropdowns']}),
     html.Div([
         dcc.DatePickerRange(
             id='date_picker_range',
-            start_date=dt.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
-            end_date=dt.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
+            start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
+            end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
             end_date_placeholder_text='Select a date!'
         )
-            ]
+    ]
     )
 ])
 
@@ -157,7 +152,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     [dash.dependencies.Input('asset_choice', 'value'),
      dash.dependencies.Input('measure_choice', 'value'),
      dash.dependencies.Input('date_picker_range', 'start_date'),
-     dash.dependencies.Input('date_picker_range', 'end_date')])    
+     dash.dependencies.Input('date_picker_range', 'end_date')])
 def update_graph(selected_asset, selected_measure, selected_start_date, selected_end_date):
     filtered_df = result_ohlc[result_ohlc.asset == selected_asset]
     filtered_df = filtered_df[filtered_df.time >= selected_start_date]
@@ -167,15 +162,15 @@ def update_graph(selected_asset, selected_measure, selected_start_date, selected
             {'x': filtered_df['time'],
              'y': filtered_df[selected_measure],
              'name': 'Open price'}
-                ],
+        ],
         'layout': {
-                'plot_bgcolor': colors['background'],
-                'paper_bgcolor': colors['background'],
-                'font': {
-                    'color': colors['text']
-                }
+            'plot_bgcolor': colors['background'],
+            'paper_bgcolor': colors['background'],
+            'font': {
+                'color': colors['text']
+            }
         }
-    } 
+    }
 
 
 if __name__ == '__main__':
