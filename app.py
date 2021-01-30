@@ -6,10 +6,14 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import datetime as dt
+import os
 
 
-kraken = krakenex.API()
-kraken.load_key('../auth/kraken.key')
+try:
+    kraken = krakenex.API()
+    kraken.load_key('../auth/kraken.key')
+except FileNotFoundError:
+    kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
 
 interval_in_minutes = '1440'
 result_ohlc = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
@@ -72,7 +76,8 @@ print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'no more data to collect from
 
 # Dash App
 
-app = dash.Dash('Kraken World')
+app = dash.Dash(__name__)
+server = app.server
 
 dropdown_options = []
 assets.sort()
