@@ -76,6 +76,7 @@ print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'no more data to collect from
 # Dash App
 
 app = dash.Dash('Kraken World')
+server = app.server
 
 dropdown_options = []
 assets.sort()
@@ -178,4 +179,4 @@ def update_graph(selected_asset, selected_measure, selected_start_date, selected
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
