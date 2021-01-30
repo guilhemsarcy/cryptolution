@@ -38,7 +38,7 @@ print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'list of asset pairs collecte
 for k in range(0, len(assetPairs)):
     asset_k = assetPairs[k]
     result_ohlc_asset_k = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
-    
+
     ret = 0
     while ret == 0: 
         try:
@@ -49,12 +49,12 @@ for k in range(0, len(assetPairs)):
             ret = 0
             time.sleep(5)
     print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'trying to collect data for asset ' + asset_k)
-    
+
     try:
         error = query_ohlc_k['error'][0]
     except IndexError:
         error = 'No error'
-        
+
     if error == 'No error':
         assets.append(asset_k)
         data_ohlc_asset_k = query_ohlc_k['result'][asset_k] 
@@ -68,7 +68,6 @@ for k in range(0, len(assetPairs)):
         print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : '+'data collected for asset ' + asset_k +
               ' - current progress is ' + str(int(float(k + 1)/float(len(assetPairs)) * 100)) + '%')
         result_ohlc = pd.concat([result_ohlc, result_ohlc_asset_k])
-        
     else:
         print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : '+'data not collected for asset ' + asset_k)
 
