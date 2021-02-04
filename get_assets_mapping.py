@@ -1,0 +1,29 @@
+import requests
+import json
+from bs4 import BeautifulSoup
+
+
+def get_assets_mapping():
+    res = requests.get("https://coinmarketcap.com/all/views/all/")
+    res.raise_for_status()
+
+    soup = BeautifulSoup(res.text, "html.parser")
+    table = soup.find_all('table')[2]
+
+    rows = list()
+    for row in table.findAll("tr")[1:]:
+        rows.append(row)
+
+    mp = {}
+    for r in rows:
+        value = r.find_all('td')
+        mp[value[2].text] = value[1].text
+        mp['XBT'] = 'Bitcoin'
+
+    return mp
+
+
+if __name__ == '__main__':
+    mapping = get_assets_mapping()
+    with open('mapping.json', 'w') as jsn:
+        json.dump(mapping, jsn, sort_keys=True, indent=4)
