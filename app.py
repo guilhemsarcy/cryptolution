@@ -33,7 +33,7 @@ while ret == 0:
 assetPairs = assetPairs['result']
 assets = []
 print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'list of asset pairs collected')
-assetPairs = {'BCHEUR', 'XDGEUR'}
+assetPairs = [a for a in assetPairs.keys() if a.endswith('EUR') or a.endswith('USD')]
 
 for k, asset in enumerate(assetPairs):
     current_asset = asset
@@ -79,10 +79,15 @@ print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'no more data to collect from
 app = dash.Dash(__name__)
 server = app.server
 
-dropdown_options = []
+dropdown_currency_options = []
+currency_options = ['EUR', 'USD']
+for c in range(0, len(currency_options)):
+    dropdown_currency_options.append(dict([('label', currency_options[c]), ('value', currency_options[c])]))
+
+dropdown_asset_options = []
 assets.sort()
 for j in range(0, len(assets)):
-    dropdown_options.append(dict([('label', assets[j]), ('value', assets[j])]))
+    dropdown_asset_options.append(dict([('label', assets[j]), ('value', assets[j])]))
 
 measure_options = []
 measures = ['open_price', 'close_price', 'volume']
@@ -96,10 +101,17 @@ colors = {
 }
 
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
+    html.Label(children='Select your currency', style={'color': colors['text_dropdowns']}),
+    dcc.Dropdown(
+        id='currency_choice',
+        options=dropdown_currency_options,
+        value='EUR'
+    ),
+
     html.Label(children='Select your asset pair', style={'color': colors['text_dropdowns']}),
     dcc.Dropdown(
         id='asset_choice',
-        options=dropdown_options,
+        options=dropdown_asset_options,
         value='XXBTZEUR'
     ),
 
