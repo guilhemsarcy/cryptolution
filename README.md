@@ -1,5 +1,5 @@
-# Whats Up Kraken
+# The cryptocurrency market
 
 The work is divided into two main parts : 
-- building a bot to collect data from Kraken
+- collecting and cleaning data from Kraken API
 - visualizing these data with an interactive Python App (Dash)
