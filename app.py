@@ -79,20 +79,14 @@ print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'no more data to collect from
 app = dash.Dash(__name__)
 server = app.server
 
-dropdown_currency_options = []
 currency_options = ['EUR', 'USD']
-for c in range(0, len(currency_options)):
-    dropdown_currency_options.append(dict([('label', currency_options[c]), ('value', currency_options[c])]))
+dropdown_currency_options = [{'label': c, 'value': c} for c in currency_options]
 
-dropdown_asset_options = []
 assets.sort()
-for j in range(0, len(assets)):
-    dropdown_asset_options.append(dict([('label', assets[j]), ('value', assets[j])]))
+dropdown_asset_options = [{'label': a, 'value': a} for a in assets]
 
-measure_options = []
 measures = ['open_price', 'close_price', 'volume']
-for m in range(0, len(measures)):
-    measure_options.append(dict([('label', measures[m]), ('value', measures[m])]))
+measure_options = [{'label': m, 'value': m} for m in measures]
 
 colors = {
     'background': '#111111',
@@ -162,6 +156,14 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     ]
     )
 ])
+
+
+@app.callback(
+    dash.dependencies.Output('asset_choice', 'options'),
+    dash.dependencies.Input('currency_choice', 'value')
+)
+def update_assets_list(currency):
+    return [{'label': a, 'value': a} for a in assets if a.endswith(currency)]
 
 
 @app.callback(
