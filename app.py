@@ -2,6 +2,7 @@ import krakenex
 import time
 import pandas as pd
 import dash
+import json
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
@@ -16,39 +17,51 @@ except FileNotFoundError:
     kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
 
 interval_in_minutes = '1440'
-result_ohlc = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
+result_ohlc = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
+                                    'time', 'open_price', 'close_price', 'volume'])
 
-print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'starting to collect data from Kraken')
+print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+      'starting to collect data from Kraken')
 
-ret = 0
-while ret == 0:
+ret = False
+while not ret:
     try:
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'trying to collect the list of asset pairs')
+        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+              'trying to collect the list of asset pairs')
         assetPairs = kraken.query_public('AssetPairs')
-        ret = 1
+        ret = True
     except ValueError:
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Kraken not available - retry after 5 sec')
-        ret = 0
+        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+              'Kraken not available - retry after 5 sec')
         time.sleep(5)
-assetPairs = assetPairs['result']
-assets = []
-print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'list of asset pairs collected')
-assetPairs = [a for a in assetPairs.keys() if a.endswith('EUR') or a.endswith('USD')]
+pairs = assetPairs['result']
+print(time.strftime('%Y-%m-%d %H:%M:%S') +
+      ' : ' + 'list of asset pairs collected')
+pairs = {p: {'wsname': pairs[p]['wsname'],
+             'asset': pairs[p]['wsname'].split('/')[0],
+             'currency': pairs[p]['wsname'].split('/')[1]
+             } for p in pairs if p.endswith('EUR') or p.endswith('USD')
+         }
 
-for k, asset in enumerate(assetPairs):
-    current_asset = asset
-    current_result_ohlc_asset = pd.DataFrame(columns=['asset', 'time', 'open_price', 'close_price', 'volume'])
-
-    ret = 0
-    while ret == 0:
+for k, items in enumerate(pairs.items()):
+    asset_pair = items[0]
+    wsname = items[1]['wsname']
+    asset = items[1]['asset']
+    currency = items[1]['currency']
+    current_result_ohlc_asset = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
+                                                      'time', 'open_price', 'close_price', 'volume'])
+    ret = False
+    while not ret:
         try:
-            current_query_ohlc = kraken.query_public('OHLC', {'pair': current_asset, 'interval': interval_in_minutes})
-            ret = 1
+            current_query_ohlc = kraken.query_public(
+                'OHLC', {'pair': asset_pair, 'interval': interval_in_minutes})
+            ret = True
         except ValueError:
-            print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'Kraken not available ' + '- retry after 5 sec')
-            ret = 0
+            print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+                  'Kraken not available ' + '- retry after 5 sec')
             time.sleep(5)
-    print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'trying to collect data for asset ' + current_asset)
+    print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+          'trying to collect data for asset pair ' + asset_pair)
 
     try:
         error = current_query_ohlc['error'][0]
@@ -56,23 +69,28 @@ for k, asset in enumerate(assetPairs):
         error = 'No error'
 
     if error == 'No error':
-        assets.append(current_asset)
-        current_data_ohlc_asset = current_query_ohlc['result'][current_asset]
+        current_data_ohlc_asset = current_query_ohlc['result'][asset_pair]
         for i in range(0, len(current_data_ohlc_asset)):
-            temp_asset = current_asset  # asset
-            temp_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_data_ohlc_asset[i][0]))  # period
-            temp_open_price = current_data_ohlc_asset[i][1]  # price at the beginning of the period
-            temp_close_price = current_data_ohlc_asset[i][4]  # price at the end of the period
-            temp_volume = current_data_ohlc_asset[i][6]  # number of shares traded
-            current_result_ohlc_asset.loc[i] = [temp_asset, temp_time, temp_open_price, temp_close_price, temp_volume]
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'data collected for asset ' + current_asset +
-              ' - current progress is ' + str(int(float(k + 1) / float(len(assetPairs)) * 100)) + '%')
+            temp_time = time.strftime(
+                '%Y-%m-%d %H:%M:%S', time.localtime(current_data_ohlc_asset[i][0]))  # period
+            # price at the beginning of the period
+            temp_open_price = current_data_ohlc_asset[i][1]
+            # price at the end of the period
+            temp_close_price = current_data_ohlc_asset[i][4]
+            # number of shares traded
+            temp_volume = current_data_ohlc_asset[i][6]
+            current_result_ohlc_asset.loc[i] = [asset_pair, wsname, asset, currency, temp_time,
+                                                temp_open_price, temp_close_price, temp_volume]
+        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'data collected for asset pair ' + asset_pair +
+              ' - current progress is ' + str(int(float(k + 1) / float(len(pairs)) * 100)) + '%')
         result_ohlc = pd.concat([result_ohlc, current_result_ohlc_asset])
 
     else:
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'data not collected for asset ' + current_asset)
+        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+              'data not collected for asset pair ' + asset_pair)
 
-print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'no more data to collect from Kraken')
+print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
+      'No more data to collect from Kraken')
 
 # Dash App
 
@@ -82,8 +100,11 @@ server = app.server
 currency_options = ['EUR', 'USD']
 dropdown_currency_options = [{'label': c, 'value': c} for c in currency_options]
 
+with open('assets_mapping/mapping.json') as json_mapping_file:
+    mapping = json.load(json_mapping_file)
+assets = [a for a in pairs]
 assets.sort()
-dropdown_asset_options = [{'label': a, 'value': a} for a in assets]
+dropdown_asset_options = [{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets]
 
 measures = ['open_price', 'close_price', 'volume']
 measure_options = [{'label': m, 'value': m} for m in measures]
@@ -106,7 +127,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     dcc.Dropdown(
         id='asset_choice',
         options=dropdown_asset_options,
-        value='XXBTZEUR'
+        value=''
     ),
 
     html.Label(children='Select your KPI', style={'color': colors['text_dropdowns']}),
@@ -162,8 +183,8 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     dash.dependencies.Output('asset_choice', 'options'),
     dash.dependencies.Input('currency_choice', 'value')
 )
-def update_assets_list(currency):
-    return [{'label': a, 'value': a} for a in assets if a.endswith(currency)]
+def update_assets_list(curr):
+    return [{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets if a.endswith(curr)]
 
 
 @app.callback(
@@ -173,7 +194,7 @@ def update_assets_list(currency):
      dash.dependencies.Input('date_picker_range', 'start_date'),
      dash.dependencies.Input('date_picker_range', 'end_date')])
 def update_graph(selected_asset, selected_measure, selected_start_date, selected_end_date):
-    filtered_df = result_ohlc[result_ohlc.asset == selected_asset]
+    filtered_df = result_ohlc[result_ohlc.asset_pair == selected_asset]
     filtered_df = filtered_df[filtered_df.time >= selected_start_date]
     filtered_df = filtered_df[filtered_df.time <= selected_end_date]
     return {
