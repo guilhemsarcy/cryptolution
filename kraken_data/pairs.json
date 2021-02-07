@@ -1,0 +1,27 @@
+{
+    "AAVEEUR": {
+        "asset": "AAVE",
+        "currency": "EUR",
+        "wsname": "AAVE/EUR"
+    },
+    "AAVEUSD": {
+        "asset": "AAVE",
+        "currency": "USD",
+        "wsname": "AAVE/USD"
+    },
+    "ADAEUR": {
+        "asset": "ADA",
+        "currency": "EUR",
+        "wsname": "ADA/EUR"
+    },
+    "ADAUSD": {
+        "asset": "ADA",
+        "currency": "USD",
+        "wsname": "ADA/USD"
+    },
+    "ALGOEUR": {
+        "asset": "ALGO",
+        "currency": "EUR",
+        "wsname": "ALGO/EUR"
+    }
+}
