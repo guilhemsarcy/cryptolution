@@ -43,6 +43,7 @@ pairs = {p: {'wsname': pairs[p]['wsname'],
              } for p in pairs if p.endswith('EUR') or p.endswith('USD')
          }
 
+
 for k, items in enumerate(pairs.items()):
     asset_pair = items[0]
     wsname = items[1]['wsname']
