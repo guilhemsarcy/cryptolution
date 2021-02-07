@@ -42,7 +42,10 @@ pairs = {p: {'wsname': pairs[p]['wsname'],
              'currency': pairs[p]['wsname'].split('/')[1]
              } for p in pairs if p.endswith('EUR') or p.endswith('USD')
          }
-
+# test on few items
+from itertools import islice
+pairs = dict(islice(pairs.items(), 5))
+# end test
 
 for k, items in enumerate(pairs.items()):
     asset_pair = items[0]
