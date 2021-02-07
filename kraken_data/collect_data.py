@@ -3,9 +3,12 @@ import time
 import os
 import pandas as pd
 import json
+from itertools import islice
+
+from settings import COLLECTION_SETTINGS
 
 
-def collect_data():
+def collect_data(settings=COLLECTION_SETTINGS):
 
     try:
         kraken = krakenex.API()
@@ -13,7 +16,7 @@ def collect_data():
     except FileNotFoundError:
         kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
 
-    interval_in_minutes = '1440'
+    interval_in_minutes = settings['query_period_in_minutes']
     result_ohlc = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
                                         'time', 'open_price', 'close_price', 'volume'])
 
@@ -40,8 +43,7 @@ def collect_data():
                  } for p in pairs if p.endswith('EUR') or p.endswith('USD')
              }
     # test on few items
-    from itertools import islice
-    pairs = dict(islice(pairs.items(), 5))
+    pairs = dict(islice(pairs.items(), settings['max_number_of_items']))
     # end test
 
     for k, items in enumerate(pairs.items()):
