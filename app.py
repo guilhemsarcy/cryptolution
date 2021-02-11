@@ -1,7 +1,6 @@
 import pandas as pd
 import dash
 import json
-from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import datetime as dt

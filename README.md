@@ -1,5 +1,7 @@
 ![lint](https://github.com/guilhemsarcy/cryptolution/workflows/lint/badge.svg)
 ![doc](https://github.com/guilhemsarcy/cryptolution/workflows/doc/badge.svg)
+![python version](https://img.shields.io/badge/dynamic/json?color=blue&label=python&query=python&url=https%3A%2F%2Fraw.githubusercontent.com%2Fguilhemsarcy%2Fcryptolution%2Fmaster%2Fpackage.json)
+![dash version](https://img.shields.io/badge/dynamic/json?color=blue&label=dash&query=dependencies.dash&url=https%3A%2F%2Fraw.githubusercontent.com%2Fguilhemsarcy%2Fcryptolution%2Fmaster%2Fpackage.json)
 ![last commit](https://img.shields.io/github/last-commit/guilhemsarcy/cryptolution)
 ![commit activity](https://img.shields.io/github/commit-activity/m/guilhemsarcy/cryptolution?color=blue)
 
