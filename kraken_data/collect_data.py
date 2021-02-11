@@ -1,10 +1,10 @@
-import krakenex
-import time
-import os
-import pandas as pd
 import json
+import os
+import time
 from itertools import islice
 
+import krakenex
+import pandas as pd
 from settings import COLLECTION_SETTINGS
 
 
