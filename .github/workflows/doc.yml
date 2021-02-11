@@ -1,4 +1,4 @@
-name: Quality - doc
+name: doc
 
 on: [push]
 

@@ -1,4 +1,4 @@
-name: Quality - lint
+name: lint
 
 on: [push]
 
