@@ -1,3 +1,6 @@
+![CI lint](https://github.com/guilhemsarcy/cryptolution/workflows/lint/badge.svg)
+![CI doc](https://github.com/guilhemsarcy/cryptolution/workflows/doc/badge.svg)
+
 # The cryptocurrency market
 
 The work is divided into two main parts : 
