@@ -1,5 +1,5 @@
-![CI lint](https://github.com/guilhemsarcy/cryptolution/workflows/lint/badge.svg)
-![CI doc](https://github.com/guilhemsarcy/cryptolution/workflows/doc/badge.svg)
+![lint](https://github.com/guilhemsarcy/cryptolution/workflows/lint/badge.svg)
+![doc](https://github.com/guilhemsarcy/cryptolution/workflows/doc/badge.svg)
 
 # The cryptocurrency market
 
