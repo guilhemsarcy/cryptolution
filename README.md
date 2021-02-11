@@ -1,5 +1,7 @@
 ![lint](https://github.com/guilhemsarcy/cryptolution/workflows/lint/badge.svg)
 ![doc](https://github.com/guilhemsarcy/cryptolution/workflows/doc/badge.svg)
+![last commit](https://img.shields.io/github/last-commit/guilhemsarcy/cryptolution)
+![commit activity](https://img.shields.io/github/commit-activity/m/guilhemsarcy/cryptolution?color=blue)
 
 # The cryptocurrency market
 
