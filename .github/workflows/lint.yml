@@ -1,9 +1,9 @@
-name: lint
+name: CI
 
 on: [push]
 
 jobs:
-  run-linter:
+  linter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
