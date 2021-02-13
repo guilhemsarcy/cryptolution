@@ -11,8 +11,8 @@ import pandas as pd
 app = dash.Dash(__name__, assets_folder='css', assets_url_path="/css")
 server = app.server
 
-result_ohlc = pd.read_csv("kraken_data/data.csv")
-with open('kraken_data/pairs.json') as json_pairs:
+result_ohlc = pd.read_csv("data/data.csv")
+with open('data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
 
 currency_options = ['EUR', 'USD']
