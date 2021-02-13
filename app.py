@@ -65,10 +65,11 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
     html.Div([
         dcc.DatePickerRange(
             id='date_picker_range',
+            display_format='YYYY-MM-DD',
+            month_format='YYYY, MMMM',
             start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
             end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
-            end_date_placeholder_text='Select a date!',
-
+            end_date_placeholder_text='Select a date!'
         ),
     ]
     ),
