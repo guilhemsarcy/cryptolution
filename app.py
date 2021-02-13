@@ -8,7 +8,7 @@ import pandas as pd
 
 # Dash App
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, assets_folder='css', assets_url_path="/css")
 server = app.server
 
 result_ohlc = pd.read_csv("kraken_data/data.csv")
@@ -34,6 +34,12 @@ colors = {
 }
 
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
+    html.H1(
+        children='Cryptocurrency market',
+        style={
+            'textAlign': 'center'
+        }
+    ),
     html.Label(children='Select your currency', style={'color': colors['text_dropdowns']}),
     dcc.Dropdown(
         id='currency_choice',
@@ -55,18 +61,17 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
         value='open_price'
     ),
 
-    html.H1(
-        children='Cryptocurrencies on Kraken',
-        style={
-            'textAlign': 'center',
-            'color': colors['text']
-        }
-    ),
+    html.Label(children='Select your date range'),
+    html.Div([
+        dcc.DatePickerRange(
+            id='date_picker_range',
+            start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
+            end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
+            end_date_placeholder_text='Select a date!',
 
-    html.Div(children='Using Kraken API to collect data about cryptocurrencies', style={
-        'textAlign': 'center',
-        'color': colors['text']
-    }),
+        ),
+    ]
+    ),
 
     dcc.Graph(
         id='graph_1',
@@ -82,17 +87,6 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                 }
             }
         }
-    ),
-
-    html.Label(children='Select your date range', style={'color': colors['text_dropdowns']}),
-    html.Div([
-        dcc.DatePickerRange(
-            id='date_picker_range',
-            start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
-            end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
-            end_date_placeholder_text='Select a date!'
-        )
-    ]
     )
 ])
 
