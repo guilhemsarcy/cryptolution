@@ -1,3 +1,4 @@
+![status](https://img.shields.io/website?down_color=red&down_message=offline&label=app%20status&up_color=green&up_message=online&url=https%3A%2F%2Fcryptolution.herokuapp.com%2F)
 ![lint](https://github.com/guilhemsarcy/cryptolution/workflows/lint/badge.svg)
 ![doc](https://github.com/guilhemsarcy/cryptolution/workflows/doc/badge.svg)
 ![python version](https://img.shields.io/badge/dynamic/json?color=blue&label=python&query=python&url=https%3A%2F%2Fraw.githubusercontent.com%2Fguilhemsarcy%2Fcryptolution%2Fmaster%2Fpackage.json)
