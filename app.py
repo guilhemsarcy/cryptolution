@@ -3,15 +3,32 @@ import json
 
 import dash
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import pandas as pd
+import datetime as dt
+from datetime import timedelta
 
 # Dash App
 
-app = dash.Dash(__name__, assets_folder='css', assets_url_path="/css")
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
 result_ohlc = pd.read_csv("data/data.csv")
+last_date = dt.datetime.strptime(max(result_ohlc.time)[:10], '%Y-%m-%d')
+if last_date >= dt.datetime.now() - timedelta(days=1):
+    status = 'fresh'
+elif last_date >= dt.datetime.now() - timedelta(days=10):
+    status = 'half_fresh'
+else:
+    status = 'rotten'
+
+status_mapping = {
+    'fresh': 'success',
+    'half_fresh': 'warning',
+    'rotten': 'danger'
+}
+
 with open('data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
 
@@ -29,39 +46,48 @@ measure_options = [{'label': m, 'value': m} for m in measures]
 
 colors = {
     'background': '#111111',
-    'text': '#7FDBFF',
+    'text': 'white',
     'text_dropdowns': '#F9FBFC'
 }
 
-app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
+app.layout = html.Div(style={'backgroundColor': colors['background'],
+                             'color': colors['text_dropdowns']
+                             }, children=[
     html.H1(
         children='Cryptocurrency market',
         style={
-            'textAlign': 'center'
+            'textAlign': 'center',
+            'color': colors['text']
         }
     ),
     html.Label(children='Select your currency', style={'color': colors['text_dropdowns']}),
     dcc.Dropdown(
         id='currency_choice',
         options=dropdown_currency_options,
-        value='EUR'
+        value='EUR',
+        style={'backgroundColor': colors['background'],
+               'color': 'black'}
     ),
 
     html.Label(children='Select your asset pair', style={'color': colors['text_dropdowns']}),
     dcc.Dropdown(
         id='asset_choice',
         options=dropdown_asset_options,
-        value=''
+        value='',
+        style={'backgroundColor': colors['background'],
+               'color': 'black'}
     ),
 
     html.Label(children='Select your KPI', style={'color': colors['text_dropdowns']}),
     dcc.Dropdown(
         id='measure_choice',
         options=measure_options,
-        value='open_price'
+        value='open_price',
+        style={'backgroundColor': colors['background'],
+               'color': 'black'}
     ),
 
-    html.Label(children='Select your date range'),
+    html.Label(children='Select your date range', style={'color': colors['text_dropdowns']}),
     html.Div([
         dcc.DatePickerRange(
             id='date_picker_range',
@@ -69,7 +95,9 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
             month_format='YYYY, MMMM',
             start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
             end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
-            end_date_placeholder_text='Select a date!'
+            end_date_placeholder_text='Select a date!',
+            style={'backgroundColor': colors['background'],
+                   'color': 'black'}
         ),
     ]
     ),
@@ -88,6 +116,11 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children=
                 }
             }
         }
+    ),
+
+    html.Div([
+        dbc.Button(f"Last available data : {max(result_ohlc.time)[:10]}", size="lg", outline=True, color=f"{status_mapping[status]}", disabled=True, className="mr-1")
+    ]
     )
 ])
 

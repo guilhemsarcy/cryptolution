@@ -43,7 +43,7 @@ def collect_data(settings=COLLECTION_SETTINGS):
                  } for p in pairs if p.endswith('EUR') or p.endswith('USD')
              }
     # test on few items
-    pairs = dict(islice(pairs.items(), settings['max_number_of_items']))
+    pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
     # end test
 
     for k, items in enumerate(pairs.items()):
