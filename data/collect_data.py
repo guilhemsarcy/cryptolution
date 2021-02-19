@@ -1,3 +1,5 @@
+"""Script for data collection from Kraken."""
+
 import json
 import os
 import time
@@ -9,6 +11,12 @@ from settings import COLLECTION_SETTINGS
 
 
 def collect_data(settings=COLLECTION_SETTINGS):
+    """
+    Get data related to the cryptocurrency market from Kraken API, and build dataset.
+
+    :param settings: some parameters for data collection
+    :type settings: Dict
+    """
 
     try:
         kraken = krakenex.API()

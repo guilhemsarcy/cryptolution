@@ -1,3 +1,5 @@
+"""Script for scrapping explicit names from raw currency codes."""
+
 import json
 
 import requests
@@ -5,6 +7,12 @@ from bs4 import BeautifulSoup
 
 
 def get_assets_mapping():
+    """
+    Scrap coinmarketcap.com and get labels associated to currency codes.
+
+    :return: a mapping between currency code and label
+    :rtype: Dict
+    """
     res = requests.get("https://coinmarketcap.com/all/views/all/")
     res.raise_for_status()
 

@@ -1,3 +1,5 @@
+"""Main script describing dash app."""
+
 import datetime as dt
 import json
 from datetime import timedelta
@@ -48,7 +50,7 @@ colors = {
 }
 
 app.layout = html.Div(style={'backgroundColor': colors['background'],
-                             'color': colors['text_dropdowns']
+                             'color': colors['text_dropdowns'],
                              }, children=[
     html.H1(
         children='Cryptocurrency market',
@@ -127,6 +129,15 @@ app.layout = html.Div(style={'backgroundColor': colors['background'],
     dash.dependencies.Input('currency_choice', 'value')
 )
 def update_assets_list(curr):
+    """
+    Update assets' dropdown component, based on currency choice.
+
+    :param curr: currency
+    :type curr: string
+
+    :return: dropdown component definition for assets
+    :rtype: List[Dict]
+    """
     return [{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets if a.endswith(curr)]
 
 
@@ -137,6 +148,21 @@ def update_assets_list(curr):
      dash.dependencies.Input('date_picker_range', 'start_date'),
      dash.dependencies.Input('date_picker_range', 'end_date')])
 def update_graph(selected_asset, selected_measure, selected_start_date, selected_end_date):
+    """
+    Update graph component, base on asset, measure, start date and end date.
+
+    :param selected_asset: asset choice
+    :type selected_asset: string
+    :param selected_measure: measure choice
+    :type selected_measure: string
+    :param selected_start_date: choice for start date
+    :type selected_start_date: datetime
+    :param selected_end_date: choice for end date
+    :type selected_end_date: datetime
+
+    :return: graph component definition for asset's evolution
+    :rtype: Dict
+    """
     filtered_df = result_ohlc[result_ohlc.asset_pair == selected_asset]
     filtered_df = filtered_df[filtered_df.time >= selected_start_date]
     filtered_df = filtered_df[filtered_df.time <= selected_end_date]

@@ -18,4 +18,4 @@ jobs:
           python -m pip install pydocstyle
       - name: Check for docstrings
         run: |
-          pydocstyle . --count --ignore=D107
+          pydocstyle . --count --ignore=D107,D202,D212
