@@ -3,3 +3,4 @@ notebook/*
 auth/
 heroku_*
 css/
+*__pycache__*

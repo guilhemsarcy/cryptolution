@@ -1,5 +1,6 @@
 """Script for data collection from Kraken."""
 
+import logging
 import json
 import os
 import time
@@ -8,6 +9,9 @@ from itertools import islice
 import krakenex
 import pandas as pd
 from settings import COLLECTION_SETTINGS
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 def collect_data(settings=COLLECTION_SETTINGS):
@@ -28,31 +32,25 @@ def collect_data(settings=COLLECTION_SETTINGS):
     result_ohlc = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
                                         'time', 'open_price', 'close_price', 'volume'])
 
-    print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-          'starting to collect data from Kraken')
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : starting to collect data from Kraken")
 
     ret = False
     while not ret:
         try:
-            print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-                  'trying to collect the list of asset pairs')
+            logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect the list of asset pairs")
             assetPairs = kraken.query_public('AssetPairs')
             ret = True
         except ValueError:
-            print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-                  'Kraken not available - retry after 5 sec')
+            logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
             time.sleep(5)
     pairs = assetPairs['result']
-    print(time.strftime('%Y-%m-%d %H:%M:%S') +
-          ' : ' + 'list of asset pairs collected')
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : list of asset pairs collected")
     pairs = {p: {'wsname': pairs[p]['wsname'],
                  'asset': pairs[p]['wsname'].split('/')[0],
                  'currency': pairs[p]['wsname'].split('/')[1]
                  } for p in pairs if p.endswith('EUR') or p.endswith('USD')
              }
-    # test on few items
     pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
-    # end test
 
     for k, items in enumerate(pairs.items()):
         asset_pair = items[0]
@@ -68,11 +66,9 @@ def collect_data(settings=COLLECTION_SETTINGS):
                     'OHLC', {'pair': asset_pair, 'interval': interval_in_minutes})
                 ret = True
             except ValueError:
-                print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-                      'Kraken not available ' + '- retry after 5 sec')
+                logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
                 time.sleep(5)
-        print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-              'trying to collect data for asset pair ' + asset_pair)
+        logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect data for asset pair {asset_pair}")
 
         try:
             error = current_query_ohlc['error'][0]
@@ -92,16 +88,14 @@ def collect_data(settings=COLLECTION_SETTINGS):
                 temp_volume = current_data_ohlc_asset[i][6]
                 current_result_ohlc_asset.loc[i] = [asset_pair, wsname, asset, currency, temp_time,
                                                     temp_open_price, temp_close_price, temp_volume]
-            print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' + 'data collected for asset pair ' + asset_pair +
-                  ' - current progress is ' + str(int(float(k + 1) / float(len(pairs)) * 100)) + '%')
+            logger.info(f"""{time.strftime('%Y-%m-%d %H:%M:%S')} : data collected for asset pair {asset_pair}
+                - current progress is {str(int(float(k + 1) / float(len(pairs)) * 100))}% """)
             result_ohlc = pd.concat([result_ohlc, current_result_ohlc_asset])
 
         else:
-            print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-                  'data not collected for asset pair ' + asset_pair)
+            logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : data not collected for asset pair {asset_pair}")
 
-    print(time.strftime('%Y-%m-%d %H:%M:%S') + ' : ' +
-          'No more data to collect from Kraken')
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : No more data to collect from Kraken")
 
     result_ohlc.to_csv('data.csv', index=False)
 
