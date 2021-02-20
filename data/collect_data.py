@@ -38,12 +38,13 @@ def collect_data(settings=COLLECTION_SETTINGS):
     while not ret:
         try:
             logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect the list of asset pairs")
-            assetPairs = kraken.query_public('AssetPairs')
+            asset_pairs = kraken.query_public('AssetPairs')
             ret = True
         except ValueError:
             logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
             time.sleep(5)
-    pairs = assetPairs['result']
+            continue
+    pairs = asset_pairs['result']
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : list of asset pairs collected")
     pairs = {p: {'wsname': pairs[p]['wsname'],
                  'asset': pairs[p]['wsname'].split('/')[0],
@@ -62,38 +63,29 @@ def collect_data(settings=COLLECTION_SETTINGS):
         ret = False
         while not ret:
             try:
+                logger.info(
+                    f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect data for asset pair {asset_pair}")
                 current_query_ohlc = kraken.query_public(
                     'OHLC', {'pair': asset_pair, 'interval': interval_in_minutes})
                 ret = True
+                print(current_query_ohlc)
             except ValueError:
                 logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
                 time.sleep(5)
-        logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect data for asset pair {asset_pair}")
+                continue
 
-        try:
-            error = current_query_ohlc['error'][0]
-        except IndexError:
-            error = 'No error'
+        current_data_ohlc_asset = current_query_ohlc['result'][asset_pair]
+        for i in range(0, len(current_data_ohlc_asset)):
+            temp_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_data_ohlc_asset[i][0]))  # period
+            temp_open_price = current_data_ohlc_asset[i][1]  # price at the beginning of the period
+            temp_close_price = current_data_ohlc_asset[i][4]  # price at the end of the period
+            temp_volume = current_data_ohlc_asset[i][6]  # number of shares traded
+            current_result_ohlc_asset.loc[i] = [asset_pair, wsname, asset, currency, temp_time,
+                                                temp_open_price, temp_close_price, temp_volume]
+        logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : data collected for asset pair {asset_pair}")
+        logger.info(f"current progress is {str(int(float(k + 1) / float(len(pairs)) * 100))}%")
 
-        if error == 'No error':
-            current_data_ohlc_asset = current_query_ohlc['result'][asset_pair]
-            for i in range(0, len(current_data_ohlc_asset)):
-                temp_time = time.strftime(
-                    '%Y-%m-%d %H:%M:%S', time.localtime(current_data_ohlc_asset[i][0]))  # period
-                # price at the beginning of the period
-                temp_open_price = current_data_ohlc_asset[i][1]
-                # price at the end of the period
-                temp_close_price = current_data_ohlc_asset[i][4]
-                # number of shares traded
-                temp_volume = current_data_ohlc_asset[i][6]
-                current_result_ohlc_asset.loc[i] = [asset_pair, wsname, asset, currency, temp_time,
-                                                    temp_open_price, temp_close_price, temp_volume]
-            logger.info(f"""{time.strftime('%Y-%m-%d %H:%M:%S')} : data collected for asset pair {asset_pair}
-                - current progress is {str(int(float(k + 1) / float(len(pairs)) * 100))}% """)
-            result_ohlc = pd.concat([result_ohlc, current_result_ohlc_asset])
-
-        else:
-            logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : data not collected for asset pair {asset_pair}")
+        result_ohlc = pd.concat([result_ohlc, current_result_ohlc_asset])
 
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : No more data to collect from Kraken")
 
