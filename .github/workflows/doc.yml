@@ -1,9 +1,9 @@
-name: CI
+name: doc
 
 on: [push]
 
 jobs:
-  doc:
+  run-pydoc:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
