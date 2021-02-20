@@ -1,8 +1,8 @@
 """Script for data collection from Kraken."""
 
+import json
 import logging
 import math
-import json
 import os
 import time
 from itertools import islice
