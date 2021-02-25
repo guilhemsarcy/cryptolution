@@ -14,3 +14,6 @@ The work is divided into two main parts :
 
 App URL : 
 - the app can be found at https://cryptolution.herokuapp.com/
+
+App screenshot :
+![alt text](https://github.com/guilhemsarcy/cryptolution/blob/master/other/dashboard.JPG?raw=true)
