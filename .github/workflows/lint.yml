@@ -1,9 +1,9 @@
-name: linter
+name: style
 
 on: [push]
 
 jobs:
-  run-flake8-isort:
+  linter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

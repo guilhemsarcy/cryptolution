@@ -3,7 +3,7 @@ name: doc
 on: [push]
 
 jobs:
-  run-pydoc:
+  pydoc:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
