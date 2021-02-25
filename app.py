@@ -49,79 +49,104 @@ colors = {
     'text_dropdowns': '#F9FBFC'
 }
 
-app.layout = html.Div(style={'backgroundColor': colors['background'],
-                             'color': colors['text_dropdowns'],
-                             }, children=[
-    html.H1(
-        children='Cryptocurrency market',
-        style={
-            'textAlign': 'center',
-            'color': colors['text']
-        }
-    ),
-    html.Label(children='Select your currency', style={'color': colors['text_dropdowns']}),
-    dcc.Dropdown(
-        id='currency_choice',
-        options=dropdown_currency_options,
-        value='EUR',
-        style={'backgroundColor': colors['background'],
-               'color': 'black'}
-    ),
-
-    html.Label(children='Select your asset pair', style={'color': colors['text_dropdowns']}),
-    dcc.Dropdown(
-        id='asset_choice',
-        options=dropdown_asset_options,
-        value='',
-        style={'backgroundColor': colors['background'],
-               'color': 'black'}
-    ),
-
-    html.Label(children='Select your KPI', style={'color': colors['text_dropdowns']}),
-    dcc.Dropdown(
-        id='measure_choice',
-        options=measure_options,
-        value='open_price',
-        style={'backgroundColor': colors['background'],
-               'color': 'black'}
-    ),
-
-    html.Label(children='Select your date range', style={'color': colors['text_dropdowns']}),
-    html.Div([
-        dcc.DatePickerRange(
-            id='date_picker_range',
-            display_format='YYYY-MM-DD',
-            month_format='YYYY, MMMM',
-            start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
-            end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
-            end_date_placeholder_text='Select a date!',
-            style={'backgroundColor': colors['background'],
-                   'color': 'black'}
+app.layout = html.Div(
+    style={'backgroundColor': colors['background'],
+           'color': colors['text_dropdowns']},
+    children=[
+        html.H1(
+            children='Cryptocurrency market',
+            style={
+                'textAlign': 'center',
+                'color': colors['text']
+            }
         ),
-    ]
-    ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    html.Label(children='Select your currency', style={'color': colors['text_dropdowns']})
+                ),
+                dbc.Col(
+                    html.Label(children='Select your asset pair', style={'color': colors['text_dropdowns']})
+                ),
+                dbc.Col(
+                    html.Label(children='Select your KPI', style={'color': colors['text_dropdowns']})
+                )
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(
+                    dcc.Dropdown(
+                        id='currency_choice',
+                        options=dropdown_currency_options,
+                        value='EUR',
+                        style={'backgroundColor': colors['background'], 'color': 'black'}
+                    )
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
+                        id='asset_choice',
+                        options=dropdown_asset_options,
+                        value='',
+                        style={'backgroundColor': colors['background'], 'color': 'black'}
+                    )
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
+                        id='measure_choice',
+                        options=measure_options,
+                        value='open_price',
+                        style={'backgroundColor': colors['background'], 'color': 'black'}
+                    )
+                )
+            ]
+        ),
 
-    dcc.Graph(
-        id='graph_1',
-        figure={
-            'data': [{'x': result_ohlc['time'],
-                      'y': result_ohlc['open_price']
-                      }],
-            'layout': {
-                'plot_bgcolor': colors['background'],
-                'paper_bgcolor': colors['background'],
-                'font': {
-                    'color': colors['text']
+
+        html.Label(children='Select your date range', style={'color': colors['text_dropdowns']}),
+        html.Div([
+            dcc.DatePickerRange(
+                id='date_picker_range',
+                display_format='YYYY-MM-DD',
+                month_format='YYYY, MMMM',
+                start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
+                end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
+                end_date_placeholder_text='Select a date!',
+                style={'backgroundColor': colors['background'],
+                       'color': 'black'}
+            ),
+        ]
+        ),
+
+        dcc.Graph(
+            id='graph_1',
+            figure={
+                'data': [{'x': result_ohlc['time'],
+                          'y': result_ohlc['open_price']
+                          }],
+                'layout': {
+                    'plot_bgcolor': colors['background'],
+                    'paper_bgcolor': colors['background'],
+                    'font': {
+                        'color': colors['text']
+                    }
                 }
             }
-        }
-    ),
+        ),
 
-    html.Div([
-        dbc.Button(f"Last available data : {max(result_ohlc.time)[:10]}", size="lg", outline=True, color=f"{status_mapping[status]}", disabled=True, className="mr-1")
+        html.Div([
+            dbc.Button(
+                f"Last available data : {max(result_ohlc.time)[:10]}",
+                size="lg",
+                outline=True,
+                color=f"{status_mapping[status]}",
+                disabled=True,
+                className="mr-1"
+            )
+        ]
+        )
     ]
-    )
-])
+)
 
 
 @app.callback(
