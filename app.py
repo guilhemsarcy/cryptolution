@@ -53,25 +53,19 @@ app.layout = html.Div(
     style={'backgroundColor': colors['background'],
            'color': colors['text_dropdowns']},
     children=[
-        html.H1(
-            children='Cryptocurrency market',
-            style={
-                'textAlign': 'center',
-                'color': colors['text']
-            }
-        ),
         dbc.Row(
             [
                 dbc.Col(
-                    html.Label(children='Select your currency', style={'color': colors['text_dropdowns']})
+                    html.Label(children='Reference currency choice', style={'color': colors['text_dropdowns']})
                 ),
                 dbc.Col(
-                    html.Label(children='Select your asset pair', style={'color': colors['text_dropdowns']})
+                    html.Label(children='Asset choice', style={'color': colors['text_dropdowns']})
                 ),
                 dbc.Col(
-                    html.Label(children='Select your KPI', style={'color': colors['text_dropdowns']})
+                    html.Label(children='Metric choice', style={'color': colors['text_dropdowns']})
                 )
-            ]
+            ],
+            justify="center"
         ),
         dbc.Row(
             [
@@ -99,23 +93,48 @@ app.layout = html.Div(
                         style={'backgroundColor': colors['background'], 'color': 'black'}
                     )
                 )
+            ],
+            justify="center"
+        ),
+
+        html.Label(children='Date range choice', style={'color': colors['text_dropdowns']}),
+
+        html.Div(
+            [
+                dcc.DatePickerRange(
+                    id='date_picker_range',
+                    display_format='YYYY-MM-DD',
+                    month_format='YYYY, MMMM',
+                    start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
+                    end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
+                    end_date_placeholder_text='Select a date!',
+                    style={'backgroundColor': colors['background'], 'color': 'black'}
+                ),
             ]
         ),
 
+        html.H1(
+            id='title',
+            style={'textAlign': 'center', 'color': colors['text']}
+        ),
 
-        html.Label(children='Select your date range', style={'color': colors['text_dropdowns']}),
-        html.Div([
-            dcc.DatePickerRange(
-                id='date_picker_range',
-                display_format='YYYY-MM-DD',
-                month_format='YYYY, MMMM',
-                start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
-                end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
-                end_date_placeholder_text='Select a date!',
-                style={'backgroundColor': colors['background'],
-                       'color': 'black'}
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                    [
+                        dbc.Button(
+                            f"Last available data : {max(result_ohlc.time)[:10]}",
+                            size="lg",
+                            outline=True,
+                            color=f"{status_mapping[status]}",
+                            disabled=True,
+                            className="mr-1"
+                        )
+                    ]
+                ),
+                width={"size": 6, "offset": 3}
             ),
-        ]
+            justify="center"
         ),
 
         dcc.Graph(
@@ -132,21 +151,44 @@ app.layout = html.Div(
                     }
                 }
             }
-        ),
-
-        html.Div([
-            dbc.Button(
-                f"Last available data : {max(result_ohlc.time)[:10]}",
-                size="lg",
-                outline=True,
-                color=f"{status_mapping[status]}",
-                disabled=True,
-                className="mr-1"
-            )
-        ]
         )
     ]
 )
+
+
+@app.callback(
+    dash.dependencies.Output('title', 'children'),
+    [
+        dash.dependencies.Input('currency_choice', 'value'),
+        dash.dependencies.Input('asset_choice', 'value'),
+        dash.dependencies.Input('measure_choice', 'value')
+    ]
+)
+def update_title(currency, asset, metric):
+    """
+    Update graph title according to dropdown values.
+
+    :param currency: reference currency choice
+    :type currency: string
+    :param asset: asset choice
+    :type asset: string
+    :param metric: metric choice
+    :type metric: string
+
+    :return: graph title
+    :rtype: string
+    """
+    try:
+        asset_label = mapping[pairs[asset]['asset']]
+    except KeyError:
+        asset_label = ''
+    if asset_label == '':
+        return ''
+    else:
+        if 'price' in metric:
+            return f"Evolution of daily {metric} for {asset_label} (in {currency})"
+        else:
+            return f"Evolution of daily {metric} for {asset_label}"
 
 
 @app.callback(
@@ -168,10 +210,13 @@ def update_assets_list(curr):
 
 @app.callback(
     dash.dependencies.Output('graph_1', 'figure'),
-    [dash.dependencies.Input('asset_choice', 'value'),
-     dash.dependencies.Input('measure_choice', 'value'),
-     dash.dependencies.Input('date_picker_range', 'start_date'),
-     dash.dependencies.Input('date_picker_range', 'end_date')])
+    [
+        dash.dependencies.Input('asset_choice', 'value'),
+        dash.dependencies.Input('measure_choice', 'value'),
+        dash.dependencies.Input('date_picker_range', 'start_date'),
+        dash.dependencies.Input('date_picker_range', 'end_date')
+    ]
+)
 def update_graph(selected_asset, selected_measure, selected_start_date, selected_end_date):
     """
     Update graph component, base on asset, measure, start date and end date.
