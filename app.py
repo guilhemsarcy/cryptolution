@@ -120,10 +120,10 @@ app.layout = dbc.Container(
             justify="center"
         ),
         dbc.Row(
-                dbc.Col(
-                    html.Label(children='Date range choice', style={'color': colors['text_dropdowns']}),
-                    width=2
-                )
+            dbc.Col(
+                html.Label(children='Date range choice', style={'color': colors['text_dropdowns']}),
+                width=2
+            )
         ),
         dbc.Row(
             [
