@@ -10,7 +10,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
 server = app.server
 
 result_ohlc = pd.read_csv("data/data.csv")
@@ -49,20 +49,40 @@ colors = {
     'text_dropdowns': '#F9FBFC'
 }
 
-app.layout = html.Div(
-    style={'backgroundColor': colors['background'],
-           'color': colors['text_dropdowns']},
+app.layout = dbc.Container(
     children=[
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                    [
+                        dbc.Button(
+                            f"Last available data : {max(result_ohlc.time)[:10]}",
+                            size="lg",
+                            outline=True,
+                            color=f"{status_mapping[status]}",
+                            disabled=True,
+                            className="mr-1",
+                            style={"margin-top": 10}
+                        )
+                    ]
+                ),
+                width={"size": 6, "offset": 3}
+            ),
+            justify="center"
+        ),
         dbc.Row(
             [
                 dbc.Col(
-                    html.Label(children='Reference currency choice', style={'color': colors['text_dropdowns']})
+                    html.Label(children='Reference currency choice', style={'color': colors['text_dropdowns']}),
+                    width=2
                 ),
                 dbc.Col(
-                    html.Label(children='Asset choice', style={'color': colors['text_dropdowns']})
+                    html.Label(children='Asset choice', style={'color': colors['text_dropdowns']}),
+                    width=2
                 ),
                 dbc.Col(
-                    html.Label(children='Metric choice', style={'color': colors['text_dropdowns']})
+                    html.Label(children='Metric choice', style={'color': colors['text_dropdowns']}),
+                    width=2
                 )
             ],
             justify="center"
@@ -74,8 +94,9 @@ app.layout = html.Div(
                         id='currency_choice',
                         options=dropdown_currency_options,
                         value='EUR',
-                        style={'backgroundColor': colors['background'], 'color': 'black'}
-                    )
+                        style={'backgroundColor': colors['background'], 'color': 'black', 'line-height': '34px'}
+                    ),
+                    width=2
                 ),
                 dbc.Col(
                     dcc.Dropdown(
@@ -83,7 +104,8 @@ app.layout = html.Div(
                         options=dropdown_asset_options,
                         value='',
                         style={'backgroundColor': colors['background'], 'color': 'black'}
-                    )
+                    ),
+                    width=2
                 ),
                 dbc.Col(
                     dcc.Dropdown(
@@ -91,50 +113,38 @@ app.layout = html.Div(
                         options=measure_options,
                         value='open_price',
                         style={'backgroundColor': colors['background'], 'color': 'black'}
-                    )
+                    ),
+                    width=2
                 )
             ],
             justify="center"
         ),
-
-        html.Label(children='Date range choice', style={'color': colors['text_dropdowns']}),
-
-        html.Div(
+        dbc.Row(
+            dbc.Col(
+                html.Label(children='Date range choice', style={'color': colors['text_dropdowns']}),
+                width=2
+            )
+        ),
+        dbc.Row(
             [
-                dcc.DatePickerRange(
-                    id='date_picker_range',
-                    display_format='YYYY-MM-DD',
-                    month_format='YYYY, MMMM',
-                    start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
-                    end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
-                    end_date_placeholder_text='Select a date!',
-                    style={'backgroundColor': colors['background'], 'color': 'black'}
-                ),
+                dbc.Col(
+                    dcc.DatePickerRange(
+                        id='date_picker_range',
+                        display_format='YYYY-MM-DD',
+                        month_format='YYYY, MMMM',
+                        start_date=dt.datetime.strptime(result_ohlc['time'].min(), "%Y-%m-%d %H:%M:%S"),
+                        end_date=dt.datetime.strptime(result_ohlc['time'].max(), "%Y-%m-%d %H:%M:%S"),
+                        end_date_placeholder_text='Select a date!',
+                        style={'backgroundColor': colors['background'], 'color': 'black'}
+                    ),
+                    width=2
+                )
             ]
         ),
 
         html.H1(
             id='title',
             style={'textAlign': 'center', 'color': colors['text']}
-        ),
-
-        dbc.Row(
-            dbc.Col(
-                html.Div(
-                    [
-                        dbc.Button(
-                            f"Last available data : {max(result_ohlc.time)[:10]}",
-                            size="lg",
-                            outline=True,
-                            color=f"{status_mapping[status]}",
-                            disabled=True,
-                            className="mr-1"
-                        )
-                    ]
-                ),
-                width={"size": 6, "offset": 3}
-            ),
-            justify="center"
         ),
 
         dcc.Graph(
@@ -152,7 +162,13 @@ app.layout = html.Div(
                 }
             }
         )
-    ]
+    ],
+    style={
+        'backgroundColor': colors['background'],
+        'color': colors['text_dropdowns'],
+        'height': '100vh'
+    },
+    fluid=True
 )
 
 
