@@ -13,7 +13,7 @@ import pandas as pd
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
 server = app.server
 
-result_ohlc = pd.read_csv("data/data.csv")
+result_ohlc = pd.read_csv("s3://cryptolution/data.csv")
 last_date = dt.datetime.strptime(max(result_ohlc.time)[:10], '%Y-%m-%d')
 if last_date >= dt.datetime.now() - timedelta(days=1):
     status = 'fresh'

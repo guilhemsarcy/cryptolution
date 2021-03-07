@@ -54,6 +54,11 @@ def collect_data(settings=COLLECTION_SETTINGS):
              }
     pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
 
+    # read last data to query only diff
+    try:
+        data = pd.read_csv("s3://cryptolution/data.csv")
+    except FileNotFoundError:
+        logger.warning("Data does not exist yet")
     for k, items in enumerate(pairs.items()):
         asset_pair = items[0]
         wsname = items[1]['wsname']
@@ -61,8 +66,10 @@ def collect_data(settings=COLLECTION_SETTINGS):
         currency = items[1]['currency']
         current_result_ohlc_asset = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
                                                           'time', 'tmsp', 'open_price', 'close_price', 'volume'])
-        data = pd.read_csv("data.csv")
-        last_tmsp = data[data.asset_pair == asset_pair]['tmsp'].max()
+        try:
+            last_tmsp = data[data.asset_pair == asset_pair]['tmsp'].max()
+        except UnboundLocalError:
+            last_tmsp = math.nan
         if not math.isnan(last_tmsp):
             since = last_tmsp + int(interval_in_minutes) * 60
         else:
@@ -98,8 +105,11 @@ def collect_data(settings=COLLECTION_SETTINGS):
 
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : No more data to collect from Kraken")
 
-    data = pd.concat([data, result_ohlc])
-    data.to_csv('data.csv', index=False)
+    try:
+        data = pd.concat([data, result_ohlc])
+    except UnboundLocalError:
+        data = result_ohlc.copy()
+    data.to_csv("s3://cryptolution/data.csv", index=False)
 
     with open('pairs.json', 'w') as jsn:
         json.dump(pairs, jsn, sort_keys=True, indent=4)
