@@ -3,6 +3,7 @@
 import datetime as dt
 import json
 from datetime import timedelta
+from os import getenv
 
 import dash
 import dash_bootstrap_components as dbc
@@ -10,7 +11,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 
-from os import getenv
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
 
