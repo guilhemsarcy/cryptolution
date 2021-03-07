@@ -10,6 +10,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 
+from os import getenv
+AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
 server = app.server
 
