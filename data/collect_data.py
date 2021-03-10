@@ -109,9 +109,11 @@ def collect_data(settings=COLLECTION_SETTINGS):
         data = pd.concat([data, result_ohlc])
     except UnboundLocalError:
         data = result_ohlc.copy()
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Pushing data to s3")
     data.to_csv("s3://cryptolution/data.csv", index=False)
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Data available in s3")
 
-    with open('pairs.json', 'w') as jsn:
+    with open('data/pairs.json', 'w') as jsn:
         json.dump(pairs, jsn, sort_keys=True, indent=4)
 
 

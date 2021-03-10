@@ -34,6 +34,11 @@ status_mapping = {
 
 with open('data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
+    pairs.pop("AUDUSD", None)
+    pairs.pop("KEEPEUR", None)
+    pairs.pop("KEEPUSD", None)
+    pairs.pop("XREPZEUR", None)
+    pairs.pop("XREPZUSD", None)
 
 currency_options = ['EUR', 'USD']
 dropdown_currency_options = [{'label': c, 'value': c} for c in currency_options]
@@ -42,7 +47,8 @@ with open('assets_mapping/mapping.json') as json_mapping_file:
     mapping = json.load(json_mapping_file)
 assets = [a for a in pairs]
 assets.sort()
-dropdown_asset_options = [{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets]
+dropdown_asset_options = sorted([{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets],
+                                key=lambda i: i['label'])
 
 measures = ['open_price', 'close_price', 'volume']
 measure_options = [{'label': m, 'value': m} for m in measures]
@@ -225,7 +231,8 @@ def update_assets_list(curr):
     :return: dropdown component definition for assets
     :rtype: List[Dict]
     """
-    return [{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets if a.endswith(curr)]
+    return sorted([{'label': mapping[pairs[a]['asset']], 'value': a} for a in assets if a.endswith(curr)],
+                  key=lambda i: i['label'])
 
 
 @app.callback(

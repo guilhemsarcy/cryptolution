@@ -23,5 +23,480 @@
         "asset": "ALGO",
         "currency": "EUR",
         "wsname": "ALGO/EUR"
+    },
+    "ALGOUSD": {
+        "asset": "ALGO",
+        "currency": "USD",
+        "wsname": "ALGO/USD"
+    },
+    "ANTEUR": {
+        "asset": "ANT",
+        "currency": "EUR",
+        "wsname": "ANT/EUR"
+    },
+    "ANTUSD": {
+        "asset": "ANT",
+        "currency": "USD",
+        "wsname": "ANT/USD"
+    },
+    "ATOMEUR": {
+        "asset": "ATOM",
+        "currency": "EUR",
+        "wsname": "ATOM/EUR"
+    },
+    "ATOMUSD": {
+        "asset": "ATOM",
+        "currency": "USD",
+        "wsname": "ATOM/USD"
+    },
+    "AUDUSD": {
+        "asset": "AUD",
+        "currency": "USD",
+        "wsname": "AUD/USD"
+    },
+    "BALEUR": {
+        "asset": "BAL",
+        "currency": "EUR",
+        "wsname": "BAL/EUR"
+    },
+    "BALUSD": {
+        "asset": "BAL",
+        "currency": "USD",
+        "wsname": "BAL/USD"
+    },
+    "BATEUR": {
+        "asset": "BAT",
+        "currency": "EUR",
+        "wsname": "BAT/EUR"
+    },
+    "BATUSD": {
+        "asset": "BAT",
+        "currency": "USD",
+        "wsname": "BAT/USD"
+    },
+    "BCHEUR": {
+        "asset": "BCH",
+        "currency": "EUR",
+        "wsname": "BCH/EUR"
+    },
+    "BCHUSD": {
+        "asset": "BCH",
+        "currency": "USD",
+        "wsname": "BCH/USD"
+    },
+    "COMPEUR": {
+        "asset": "COMP",
+        "currency": "EUR",
+        "wsname": "COMP/EUR"
+    },
+    "COMPUSD": {
+        "asset": "COMP",
+        "currency": "USD",
+        "wsname": "COMP/USD"
+    },
+    "CRVEUR": {
+        "asset": "CRV",
+        "currency": "EUR",
+        "wsname": "CRV/EUR"
+    },
+    "CRVUSD": {
+        "asset": "CRV",
+        "currency": "USD",
+        "wsname": "CRV/USD"
+    },
+    "DAIEUR": {
+        "asset": "DAI",
+        "currency": "EUR",
+        "wsname": "DAI/EUR"
+    },
+    "DAIUSD": {
+        "asset": "DAI",
+        "currency": "USD",
+        "wsname": "DAI/USD"
+    },
+    "DASHEUR": {
+        "asset": "DASH",
+        "currency": "EUR",
+        "wsname": "DASH/EUR"
+    },
+    "DASHUSD": {
+        "asset": "DASH",
+        "currency": "USD",
+        "wsname": "DASH/USD"
+    },
+    "DOTEUR": {
+        "asset": "DOT",
+        "currency": "EUR",
+        "wsname": "DOT/EUR"
+    },
+    "DOTUSD": {
+        "asset": "DOT",
+        "currency": "USD",
+        "wsname": "DOT/USD"
+    },
+    "EOSEUR": {
+        "asset": "EOS",
+        "currency": "EUR",
+        "wsname": "EOS/EUR"
+    },
+    "EOSUSD": {
+        "asset": "EOS",
+        "currency": "USD",
+        "wsname": "EOS/USD"
+    },
+    "EWTEUR": {
+        "asset": "EWT",
+        "currency": "EUR",
+        "wsname": "EWT/EUR"
+    },
+    "EWTUSD": {
+        "asset": "EWT",
+        "currency": "USD",
+        "wsname": "EWT/USD"
+    },
+    "FILEUR": {
+        "asset": "FIL",
+        "currency": "EUR",
+        "wsname": "FIL/EUR"
+    },
+    "FILUSD": {
+        "asset": "FIL",
+        "currency": "USD",
+        "wsname": "FIL/USD"
+    },
+    "FLOWEUR": {
+        "asset": "FLOW",
+        "currency": "EUR",
+        "wsname": "FLOW/EUR"
+    },
+    "FLOWUSD": {
+        "asset": "FLOW",
+        "currency": "USD",
+        "wsname": "FLOW/USD"
+    },
+    "GNOEUR": {
+        "asset": "GNO",
+        "currency": "EUR",
+        "wsname": "GNO/EUR"
+    },
+    "GNOUSD": {
+        "asset": "GNO",
+        "currency": "USD",
+        "wsname": "GNO/USD"
+    },
+    "GRTEUR": {
+        "asset": "GRT",
+        "currency": "EUR",
+        "wsname": "GRT/EUR"
+    },
+    "GRTUSD": {
+        "asset": "GRT",
+        "currency": "USD",
+        "wsname": "GRT/USD"
+    },
+    "ICXEUR": {
+        "asset": "ICX",
+        "currency": "EUR",
+        "wsname": "ICX/EUR"
+    },
+    "ICXUSD": {
+        "asset": "ICX",
+        "currency": "USD",
+        "wsname": "ICX/USD"
+    },
+    "KAVAEUR": {
+        "asset": "KAVA",
+        "currency": "EUR",
+        "wsname": "KAVA/EUR"
+    },
+    "KAVAUSD": {
+        "asset": "KAVA",
+        "currency": "USD",
+        "wsname": "KAVA/USD"
+    },
+    "KEEPEUR": {
+        "asset": "KEEP",
+        "currency": "EUR",
+        "wsname": "KEEP/EUR"
+    },
+    "KEEPUSD": {
+        "asset": "KEEP",
+        "currency": "USD",
+        "wsname": "KEEP/USD"
+    },
+    "KNCEUR": {
+        "asset": "KNC",
+        "currency": "EUR",
+        "wsname": "KNC/EUR"
+    },
+    "KNCUSD": {
+        "asset": "KNC",
+        "currency": "USD",
+        "wsname": "KNC/USD"
+    },
+    "KSMEUR": {
+        "asset": "KSM",
+        "currency": "EUR",
+        "wsname": "KSM/EUR"
+    },
+    "KSMUSD": {
+        "asset": "KSM",
+        "currency": "USD",
+        "wsname": "KSM/USD"
+    },
+    "LINKEUR": {
+        "asset": "LINK",
+        "currency": "EUR",
+        "wsname": "LINK/EUR"
+    },
+    "LINKUSD": {
+        "asset": "LINK",
+        "currency": "USD",
+        "wsname": "LINK/USD"
+    },
+    "LSKEUR": {
+        "asset": "LSK",
+        "currency": "EUR",
+        "wsname": "LSK/EUR"
+    },
+    "LSKUSD": {
+        "asset": "LSK",
+        "currency": "USD",
+        "wsname": "LSK/USD"
+    },
+    "MANAEUR": {
+        "asset": "MANA",
+        "currency": "EUR",
+        "wsname": "MANA/EUR"
+    },
+    "MANAUSD": {
+        "asset": "MANA",
+        "currency": "USD",
+        "wsname": "MANA/USD"
+    },
+    "NANOEUR": {
+        "asset": "NANO",
+        "currency": "EUR",
+        "wsname": "NANO/EUR"
+    },
+    "NANOUSD": {
+        "asset": "NANO",
+        "currency": "USD",
+        "wsname": "NANO/USD"
+    },
+    "OCEANEUR": {
+        "asset": "OCEAN",
+        "currency": "EUR",
+        "wsname": "OCEAN/EUR"
+    },
+    "OCEANUSD": {
+        "asset": "OCEAN",
+        "currency": "USD",
+        "wsname": "OCEAN/USD"
+    },
+    "OMGEUR": {
+        "asset": "OMG",
+        "currency": "EUR",
+        "wsname": "OMG/EUR"
+    },
+    "OMGUSD": {
+        "asset": "OMG",
+        "currency": "USD",
+        "wsname": "OMG/USD"
+    },
+    "OXTEUR": {
+        "asset": "OXT",
+        "currency": "EUR",
+        "wsname": "OXT/EUR"
+    },
+    "OXTUSD": {
+        "asset": "OXT",
+        "currency": "USD",
+        "wsname": "OXT/USD"
+    },
+    "PAXGEUR": {
+        "asset": "PAXG",
+        "currency": "EUR",
+        "wsname": "PAXG/EUR"
+    },
+    "PAXGUSD": {
+        "asset": "PAXG",
+        "currency": "USD",
+        "wsname": "PAXG/USD"
+    },
+    "QTUMEUR": {
+        "asset": "QTUM",
+        "currency": "EUR",
+        "wsname": "QTUM/EUR"
+    },
+    "QTUMUSD": {
+        "asset": "QTUM",
+        "currency": "USD",
+        "wsname": "QTUM/USD"
+    },
+    "REPV2EUR": {
+        "asset": "REPV2",
+        "currency": "EUR",
+        "wsname": "REPV2/EUR"
+    },
+    "REPV2USD": {
+        "asset": "REPV2",
+        "currency": "USD",
+        "wsname": "REPV2/USD"
+    },
+    "SCEUR": {
+        "asset": "SC",
+        "currency": "EUR",
+        "wsname": "SC/EUR"
+    },
+    "SCUSD": {
+        "asset": "SC",
+        "currency": "USD",
+        "wsname": "SC/USD"
+    },
+    "SNXEUR": {
+        "asset": "SNX",
+        "currency": "EUR",
+        "wsname": "SNX/EUR"
+    },
+    "SNXUSD": {
+        "asset": "SNX",
+        "currency": "USD",
+        "wsname": "SNX/USD"
+    },
+    "STORJEUR": {
+        "asset": "STORJ",
+        "currency": "EUR",
+        "wsname": "STORJ/EUR"
+    },
+    "STORJUSD": {
+        "asset": "STORJ",
+        "currency": "USD",
+        "wsname": "STORJ/USD"
+    },
+    "TBTCEUR": {
+        "asset": "TBTC",
+        "currency": "EUR",
+        "wsname": "TBTC/EUR"
+    },
+    "TBTCUSD": {
+        "asset": "TBTC",
+        "currency": "USD",
+        "wsname": "TBTC/USD"
+    },
+    "TRXEUR": {
+        "asset": "TRX",
+        "currency": "EUR",
+        "wsname": "TRX/EUR"
+    },
+    "TRXUSD": {
+        "asset": "TRX",
+        "currency": "USD",
+        "wsname": "TRX/USD"
+    },
+    "UNIEUR": {
+        "asset": "UNI",
+        "currency": "EUR",
+        "wsname": "UNI/EUR"
+    },
+    "UNIUSD": {
+        "asset": "UNI",
+        "currency": "USD",
+        "wsname": "UNI/USD"
+    },
+    "USDCEUR": {
+        "asset": "USDC",
+        "currency": "EUR",
+        "wsname": "USDC/EUR"
+    },
+    "USDCUSD": {
+        "asset": "USDC",
+        "currency": "USD",
+        "wsname": "USDC/USD"
+    },
+    "USDTEUR": {
+        "asset": "USDT",
+        "currency": "EUR",
+        "wsname": "USDT/EUR"
+    },
+    "USDTZUSD": {
+        "asset": "USDT",
+        "currency": "USD",
+        "wsname": "USDT/USD"
+    },
+    "WAVESEUR": {
+        "asset": "WAVES",
+        "currency": "EUR",
+        "wsname": "WAVES/EUR"
+    },
+    "WAVESUSD": {
+        "asset": "WAVES",
+        "currency": "USD",
+        "wsname": "WAVES/USD"
+    },
+    "XDGEUR": {
+        "asset": "XDG",
+        "currency": "EUR",
+        "wsname": "XDG/EUR"
+    },
+    "XDGUSD": {
+        "asset": "XDG",
+        "currency": "USD",
+        "wsname": "XDG/USD"
+    },
+    "XETCZEUR": {
+        "asset": "ETC",
+        "currency": "EUR",
+        "wsname": "ETC/EUR"
+    },
+    "XETCZUSD": {
+        "asset": "ETC",
+        "currency": "USD",
+        "wsname": "ETC/USD"
+    },
+    "XETHZEUR": {
+        "asset": "ETH",
+        "currency": "EUR",
+        "wsname": "ETH/EUR"
+    },
+    "XETHZUSD": {
+        "asset": "ETH",
+        "currency": "USD",
+        "wsname": "ETH/USD"
+    },
+    "XLTCZEUR": {
+        "asset": "LTC",
+        "currency": "EUR",
+        "wsname": "LTC/EUR"
+    },
+    "XLTCZUSD": {
+        "asset": "LTC",
+        "currency": "USD",
+        "wsname": "LTC/USD"
+    },
+    "XMLNZEUR": {
+        "asset": "MLN",
+        "currency": "EUR",
+        "wsname": "MLN/EUR"
+    },
+    "XMLNZUSD": {
+        "asset": "MLN",
+        "currency": "USD",
+        "wsname": "MLN/USD"
+    },
+    "XREPZEUR": {
+        "asset": "REP",
+        "currency": "EUR",
+        "wsname": "REP/EUR"
+    },
+    "XREPZUSD": {
+        "asset": "REP",
+        "currency": "USD",
+        "wsname": "REP/USD"
+    },
+    "XTZEUR": {
+        "asset": "XTZ",
+        "currency": "EUR",
+        "wsname": "XTZ/EUR"
     }
 }

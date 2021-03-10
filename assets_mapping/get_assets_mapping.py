@@ -1,5 +1,4 @@
 """Script for scrapping explicit names from raw currency codes."""
-
 import json
 
 import requests
@@ -27,7 +26,14 @@ def get_assets_mapping():
     for r in rows:
         value = r.find_all('td')
         mp[value[2].text] = value[1].text
-        mp['XBT'] = 'Bitcoin'
+
+    # tweaks
+    mp['TBTC'] = 'Bitcoin'
+    mp['REPV2'] = mp['REP']
+    del mp['REP']
+    mp['XDG'] = mp['DOGE']
+    del mp['DOGE']
+    mp['MLN'] = 'Melon'
 
     return mp
 
