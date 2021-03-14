@@ -2,6 +2,7 @@
 
 import datetime as dt
 import json
+from data.settings import mapping_status
 from datetime import timedelta
 from os import getenv
 
@@ -15,25 +16,14 @@ AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
+app.title = 'cryptolution'
 server = app.server
 
 result_ohlc = pd.read_csv("s3://cryptolution/data.csv")
-last_date = dt.datetime.strptime(max(result_ohlc.time)[:10], '%Y-%m-%d')
-if last_date >= dt.datetime.now() - timedelta(days=1):
-    status = 'fresh'
-elif last_date >= dt.datetime.now() - timedelta(days=10):
-    status = 'half_fresh'
-else:
-    status = 'rotten'
-
-status_mapping = {
-    'fresh': 'success',
-    'half_fresh': 'warning',
-    'rotten': 'danger'
-}
 
 with open('data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
+    # hotfix!
     pairs.pop("AUDUSD", None)
     pairs.pop("ZEURZUSD", None)
     pairs.pop("ZGBPZUSD", None)
@@ -68,11 +58,9 @@ app.layout = dbc.Container(
                 html.Div(
                     [
                         dbc.Button(
-                            # f"Last available data : {max(result_ohlc.time)[:10]}",
                             id='last_available_data',
                             size="lg",
                             outline=True,
-                            color=f"{status_mapping[status]}",
                             disabled=True,
                             className="mr-1",
                             style={"margin-top": 10}
@@ -195,6 +183,26 @@ def update_last_available_data(selected_asset):
     except ValueError:
         return f"Last available data : {max(result_ohlc.time)[:10]}"
 
+
+@app.callback(
+    dash.dependencies.Output('last_available_data', 'color'),
+    dash.dependencies.Input('asset_choice', 'value')
+)
+def update_status(selected_asset):
+    try:
+        max_date_asset = max(result_ohlc[result_ohlc.asset_pair == selected_asset].time)[:10]
+    except ValueError:
+        max_date_asset = max(result_ohlc.time)[:10]
+
+    last_date = dt.datetime.strptime(max_date_asset, '%Y-%m-%d')
+    if last_date >= dt.datetime.now() - timedelta(days=5):
+        status = 'fresh'
+    elif last_date >= dt.datetime.now() - timedelta(days=15):
+        status = 'half_fresh'
+    else:
+        status = 'rotten'
+
+    return mapping_status[status]
 
 
 @app.callback(
