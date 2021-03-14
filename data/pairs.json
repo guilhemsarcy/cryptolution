@@ -498,5 +498,80 @@
         "asset": "XTZ",
         "currency": "EUR",
         "wsname": "XTZ/EUR"
+    },
+    "XTZUSD": {
+        "asset": "XTZ",
+        "currency": "USD",
+        "wsname": "XTZ/USD"
+    },
+    "XXBTZEUR": {
+        "asset": "XBT",
+        "currency": "EUR",
+        "wsname": "XBT/EUR"
+    },
+    "XXBTZUSD": {
+        "asset": "XBT",
+        "currency": "USD",
+        "wsname": "XBT/USD"
+    },
+    "XXLMZEUR": {
+        "asset": "XLM",
+        "currency": "EUR",
+        "wsname": "XLM/EUR"
+    },
+    "XXLMZUSD": {
+        "asset": "XLM",
+        "currency": "USD",
+        "wsname": "XLM/USD"
+    },
+    "XXMRZEUR": {
+        "asset": "XMR",
+        "currency": "EUR",
+        "wsname": "XMR/EUR"
+    },
+    "XXMRZUSD": {
+        "asset": "XMR",
+        "currency": "USD",
+        "wsname": "XMR/USD"
+    },
+    "XXRPZEUR": {
+        "asset": "XRP",
+        "currency": "EUR",
+        "wsname": "XRP/EUR"
+    },
+    "XXRPZUSD": {
+        "asset": "XRP",
+        "currency": "USD",
+        "wsname": "XRP/USD"
+    },
+    "XZECZEUR": {
+        "asset": "ZEC",
+        "currency": "EUR",
+        "wsname": "ZEC/EUR"
+    },
+    "XZECZUSD": {
+        "asset": "ZEC",
+        "currency": "USD",
+        "wsname": "ZEC/USD"
+    },
+    "YFIEUR": {
+        "asset": "YFI",
+        "currency": "EUR",
+        "wsname": "YFI/EUR"
+    },
+    "YFIUSD": {
+        "asset": "YFI",
+        "currency": "USD",
+        "wsname": "YFI/USD"
+    },
+    "ZEURZUSD": {
+        "asset": "EUR",
+        "currency": "USD",
+        "wsname": "EUR/USD"
+    },
+    "ZGBPZUSD": {
+        "asset": "GBP",
+        "currency": "USD",
+        "wsname": "GBP/USD"
     }
 }

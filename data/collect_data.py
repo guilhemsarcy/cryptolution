@@ -15,12 +15,14 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def collect_data(settings=COLLECTION_SETTINGS):
+def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
     """
     Get data related to the cryptocurrency market from Kraken API, and build dataset.
 
     :param settings: some parameters for data collection
     :type settings: Dict
+    :param update_pairs: whether we need to update the dictionnary
+    :type update_pairs: bool
     """
 
     try:
@@ -113,9 +115,11 @@ def collect_data(settings=COLLECTION_SETTINGS):
     data.to_csv("s3://cryptolution/data.csv", index=False)
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Data available in s3")
 
-    with open('data/pairs.json', 'w') as jsn:
-        json.dump(pairs, jsn, sort_keys=True, indent=4)
+    if update_pairs:
+        with open('data/pairs.json', 'w') as jsn:
+            json.dump(pairs, jsn, sort_keys=True, indent=4)
 
 
 if __name__ == '__main__':
     collect_data()
+    # collect_data(update_pairs=True)

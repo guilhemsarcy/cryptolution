@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_assets_mapping():
+def update_assets_mapping():
     """
     Scrap coinmarketcap.com and get labels associated to currency codes.
 
@@ -29,16 +29,17 @@ def get_assets_mapping():
 
     # tweaks
     mp['TBTC'] = 'Bitcoin'
+    mp['XBT'] = 'Bitcoin'
     mp['REPV2'] = mp['REP']
     del mp['REP']
     mp['XDG'] = mp['DOGE']
     del mp['DOGE']
     mp['MLN'] = 'Melon'
-
+    mp['PAXG'] = 'Pax gold'
     return mp
 
 
 if __name__ == '__main__':
-    mapping = get_assets_mapping()
+    mapping = update_assets_mapping()
     with open('mapping.json', 'w') as jsn:
         json.dump(mapping, jsn, sort_keys=True, indent=4)

@@ -35,6 +35,8 @@ status_mapping = {
 with open('data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
     pairs.pop("AUDUSD", None)
+    pairs.pop("ZEURZUSD", None)
+    pairs.pop("ZGBPZUSD", None)
     pairs.pop("KEEPEUR", None)
     pairs.pop("KEEPUSD", None)
     pairs.pop("XREPZEUR", None)
@@ -66,7 +68,8 @@ app.layout = dbc.Container(
                 html.Div(
                     [
                         dbc.Button(
-                            f"Last available data : {max(result_ohlc.time)[:10]}",
+                            # f"Last available data : {max(result_ohlc.time)[:10]}",
+                            id='last_available_data',
                             size="lg",
                             outline=True,
                             color=f"{status_mapping[status]}",
@@ -180,6 +183,18 @@ app.layout = dbc.Container(
     },
     fluid=True
 )
+
+
+@app.callback(
+    dash.dependencies.Output('last_available_data', 'children'),
+    dash.dependencies.Input('asset_choice', 'value')
+)
+def update_last_available_data(selected_asset):
+    try:
+        return f"Last available data : {max(result_ohlc[result_ohlc.asset_pair == selected_asset].time)[:10]}"
+    except ValueError:
+        return f"Last available data : {max(result_ohlc.time)[:10]}"
+
 
 
 @app.callback(
