@@ -32,6 +32,8 @@ with open('data/pairs.json') as json_pairs:
     pairs.pop("KEEPUSD", None)
     pairs.pop("XREPZEUR", None)
     pairs.pop("XREPZUSD", None)
+    pairs.pop("TBTCEUR", None)
+    pairs.pop("TBTCUSD", None)
 
 currency_options = ['EUR', 'USD']
 dropdown_currency_options = [{'label': c, 'value': c} for c in currency_options]
