@@ -25,11 +25,7 @@ def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
     :type update_pairs: bool
     """
 
-    try:
-        kraken = krakenex.API()
-        kraken.load_key('../auth/kraken.key')
-    except FileNotFoundError:
-        kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
+    kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
 
     interval_in_minutes = settings['query_period_in_minutes']
     result_ohlc = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
@@ -47,14 +43,14 @@ def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
             logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
             time.sleep(5)
             continue
-    pairs = asset_pairs['result']
-    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : list of asset pairs collected")
-    pairs = {p: {'wsname': pairs[p]['wsname'],
-                 'asset': pairs[p]['wsname'].split('/')[0],
-                 'currency': pairs[p]['wsname'].split('/')[1]
-                 } for p in pairs if p.endswith('EUR') or p.endswith('USD')
-             }
-    pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
+        pairs = asset_pairs['result']
+        logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : list of asset pairs collected")
+        pairs = {p: {'wsname': pairs[p]['wsname'],
+                     'asset': pairs[p]['wsname'].split('/')[0],
+                     'currency': pairs[p]['wsname'].split('/')[1]
+                     } for p in pairs if p.endswith('EUR') or p.endswith('USD')
+                 }
+        pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
 
     # read last data to query only diff
     try:
