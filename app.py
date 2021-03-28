@@ -2,7 +2,6 @@
 
 import datetime as dt
 import json
-from data.settings import mapping_status
 from datetime import timedelta
 from os import getenv
 
@@ -11,6 +10,8 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+
+from data.settings import mapping_status
 
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
@@ -178,6 +179,15 @@ app.layout = dbc.Container(
     dash.dependencies.Input('asset_choice', 'value')
 )
 def update_last_available_data(selected_asset):
+    """
+    Update last available data (date value).
+
+    :param selected_asset: asset choice
+    :type selected_asset: string
+
+    :return: info about last date
+    :rtype: string
+    """
     try:
         return f"Last available data : {max(result_ohlc[result_ohlc.asset_pair == selected_asset].time)[:10]}"
     except ValueError:
@@ -189,6 +199,15 @@ def update_last_available_data(selected_asset):
     dash.dependencies.Input('asset_choice', 'value')
 )
 def update_status(selected_asset):
+    """
+    Update refresh status.
+
+    :param selected_asset: asset choice
+    :type selected_asset: string
+
+    :return: refresh status
+    :rtype: string
+    """
     try:
         max_date_asset = max(result_ohlc[result_ohlc.asset_pair == selected_asset].time)[:10]
     except ValueError:
