@@ -149,19 +149,7 @@ app.layout = dbc.Container(
         ),
 
         dcc.Graph(
-            id='graph_1',
-            figure={
-                'data': [{'x': result_ohlc['time'],
-                          'y': result_ohlc['open_price']
-                          }],
-                'layout': {
-                    'plot_bgcolor': colors['background'],
-                    'paper_bgcolor': colors['background'],
-                    'font': {
-                        'color': colors['text']
-                    }
-                }
-            }
+            id='graph_1'
         )
     ],
     style={
@@ -262,17 +250,20 @@ def update_assets_list(curr):
     dash.dependencies.Output('graph_1', 'figure'),
     [
         dash.dependencies.Input('asset_choice', 'value'),
+        dash.dependencies.Input('currency_choice', 'value'),
         dash.dependencies.Input('measure_choice', 'value'),
         dash.dependencies.Input('date_picker_range', 'start_date'),
         dash.dependencies.Input('date_picker_range', 'end_date')
     ]
 )
-def update_graph(selected_asset, selected_measure, selected_start_date, selected_end_date):
+def update_graph(selected_asset, selected_currency, selected_measure, selected_start_date, selected_end_date):
     """
     Update graph component, base on asset, measure, start date and end date.
 
     :param selected_asset: asset choice
     :type selected_asset: string
+    :param selected_currency: currency choice
+    :type selected_currency: string
     :param selected_measure: measure choice
     :type selected_measure: string
     :param selected_start_date: choice for start date
@@ -283,23 +274,34 @@ def update_graph(selected_asset, selected_measure, selected_start_date, selected
     :return: graph component definition for asset's evolution
     :rtype: Dict
     """
-    filtered_df = result_ohlc[result_ohlc.asset_pair == selected_asset]
-    filtered_df = filtered_df[filtered_df.time >= selected_start_date]
-    filtered_df = filtered_df[filtered_df.time <= selected_end_date]
+    filtered_df = result_ohlc[
+        (result_ohlc.asset_pair == selected_asset)
+        & (result_ohlc.currency == selected_currency)
+        & (result_ohlc.time >= selected_start_date)
+        & (result_ohlc.time <= selected_end_date)
+    ]
+    symbol = '€'
+    if selected_currency != 'EUR':
+        symbol = '$'
+
     return {
-        'data': [
-            {'x': filtered_df['time'],
-             'y': filtered_df[selected_measure],
-             'name': 'Open price'}
-        ],
-        'layout': {
-            'plot_bgcolor': colors['background'],
-            'paper_bgcolor': colors['background'],
-            'font': {
-                'color': colors['text']
+                'data': [{'x': filtered_df['time'],
+                          'y': filtered_df[selected_measure],
+                          'mode': 'lines',
+                          'line': dict(color='#749ce1', line=dict(width=5))
+                          }],
+                'layout': {
+                    'plot_bgcolor': colors['background'],
+                    'paper_bgcolor': colors['background'],
+                    'font': {
+                        'color': colors['text']
+                    },
+                    'height': 600,
+                    'yaxis': {
+                        "ticksuffix": f"{symbol}",
+                    }
+                }
             }
-        }
-    }
 
 
 if __name__ == '__main__':
