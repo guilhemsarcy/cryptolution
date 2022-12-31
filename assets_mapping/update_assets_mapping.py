@@ -5,12 +5,11 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def update_assets_mapping():
+def update_assets_mapping() -> dict:
     """
     Scrap coinmarketcap.com and get labels associated to currency codes.
 
     :return: a mapping between currency code and label
-    :rtype: Dict
     """
     res = requests.get("https://coinmarketcap.com/all/views/all/")
     res.raise_for_status()

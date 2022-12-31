@@ -15,21 +15,15 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
+def collect_data(settings: dict = COLLECTION_SETTINGS, update_pairs: bool = False):
     """
     Get data related to the cryptocurrency market from Kraken API, and build dataset.
 
     :param settings: some parameters for data collection
-    :type settings: Dict
     :param update_pairs: whether we need to update the dictionnary
-    :type update_pairs: bool
     """
 
-    try:
-        kraken = krakenex.API()
-        kraken.load_key('../auth/kraken.key')
-    except FileNotFoundError:
-        kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
+    kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
 
     interval_in_minutes = settings['query_period_in_minutes']
     result_ohlc = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
@@ -44,30 +38,39 @@ def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
             asset_pairs = kraken.query_public('AssetPairs')
             ret = True
         except ValueError:
-            logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
-            time.sleep(5)
-            continue
+            logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry later")
+            raise ValueError('Kraken unavailable at the moment')
+
     pairs = asset_pairs['result']
+
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : list of asset pairs collected")
-    pairs = {p: {'wsname': pairs[p]['wsname'],
-                 'asset': pairs[p]['wsname'].split('/')[0],
-                 'currency': pairs[p]['wsname'].split('/')[1]
-                 } for p in pairs if p.endswith('EUR') or p.endswith('USD')
-             }
+    pairs = {
+        p: {
+            'wsname': pairs[p]['wsname'],
+            'asset': pairs[p]['wsname'].split('/')[0],
+            'currency': pairs[p]['wsname'].split('/')[1]
+            }
+        for p in pairs if p.endswith('EUR') or p.endswith('USD')
+    }
     pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
 
     # read last data to query only diff
     try:
-        data = pd.read_csv("s3://cryptolution/data.csv")
+        data = pd.read_csv(settings["storage_path"])
     except FileNotFoundError:
-        logger.warning("Data does not exist yet")
+        logger.info("Data does not exist yet")
+
     for k, items in enumerate(pairs.items()):
         asset_pair = items[0]
         wsname = items[1]['wsname']
         asset = items[1]['asset']
         currency = items[1]['currency']
-        current_result_ohlc_asset = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
-                                                          'time', 'tmsp', 'open_price', 'close_price', 'volume'])
+        current_result_ohlc_asset = pd.DataFrame(
+            columns=[
+                'asset_pair', 'wsname', 'asset', 'currency',
+                'time', 'tmsp', 'open_price', 'close_price', 'volume'
+            ]
+        )
         try:
             last_tmsp = data[data.asset_pair == asset_pair]['tmsp'].max()
         except UnboundLocalError:
@@ -80,9 +83,11 @@ def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
         while not ret:
             try:
                 logger.info(
-                    f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect data for asset pair {asset_pair}")
+                    f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect data for asset pair {asset_pair}"
+                )
                 current_query_ohlc = kraken.query_public(
-                    'OHLC', {'pair': asset_pair, 'interval': interval_in_minutes, 'since': since})
+                    'OHLC', {'pair': asset_pair, 'interval': interval_in_minutes, 'since': since}
+                )
                 ret = True
             except ValueError:
                 logger.error(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Kraken not available - retry after 5 sec")
@@ -112,7 +117,7 @@ def collect_data(settings=COLLECTION_SETTINGS, update_pairs=False):
     except UnboundLocalError:
         data = result_ohlc.copy()
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Pushing data to s3")
-    data.to_csv("s3://cryptolution/data.csv", index=False)
+    data.to_csv(settings["storage_path"], index=False)
     logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Data available in s3")
 
     if update_pairs:
