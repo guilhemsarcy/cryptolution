@@ -52,7 +52,6 @@ def collect_data(settings: dict = COLLECTION_SETTINGS, update_pairs: bool = Fals
             }
         for p in pairs if p.endswith('EUR') or p.endswith('USD')
     }
-    pairs = dict(islice(pairs.items(), min(settings['max_number_of_items'], len(pairs))))
 
     # read last data to query only diff
     try:
