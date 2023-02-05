@@ -19,5 +19,11 @@ OHLC_DATA = {
     'schema': [
         'asset_pair', 'wsname', 'asset', 'currency',
         'time', 'tmsp', 'open_price', 'close_price', 'volume'
-    ]
+    ],
+    'data_index': {
+        'timestamp': 0,
+        'opening_price': 1,
+        'ending_price': 4,
+        'volume': 6
+    }
 }
