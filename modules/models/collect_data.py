@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 from modules.models.config import COLLECTION_SETTINGS, OHLC_DATA
 import os
 import krakenex
 import pandas as pd
 import time
-import math
-from modules.models.exceptions import IncompleteDataForZipping, NotConsistentDataForDataframe
+from math import isnan
 from modules.models.config import Currency
+from modules.models.utils import build_df_from_schema_and_data, compute_max_for_given_filter
 
 
 class KrakenDataCollector:
@@ -127,6 +127,19 @@ class KrakenDataCollector:
         )
         return ohlc_data['result'][asset_pair]
 
+    def compute_starting_timestamp(self, last_tmsp: int) -> int:
+        """
+        Compute the next starting timestamp based of provided timestamp and config
+
+        :param last_tmsp: last timestamp registered
+        :return: next starting timestamp
+        """
+        if not isnan(last_tmsp):
+            since = last_tmsp + int(self.collection_settings['query_period_in_seconds'])
+        else:
+            since = 0
+        return since
+
     def get_differential_ohlc_asset_data(
             self,
             asset_pair: str,
@@ -139,17 +152,18 @@ class KrakenDataCollector:
         :return: augmented data (existing data + new data)
         """
 
-        last_tmsp = existing_data_df[existing_data_df.asset_pair == asset_pair]['tmsp'].max()
-
-        if not math.isnan(last_tmsp):
-            since = last_tmsp + int(self.collection_settings['query_period_in_minutes']) * 60
-        else:
-            since = 0
+        max_timestamp = compute_max_for_given_filter(
+            df=existing_data_df,
+            maxed_field='tmsp',
+            filter_field='asset_pair',
+            filter_value=asset_pair,
+        )
+        starting_timestamp = self.compute_starting_timestamp(last_tmsp=max_timestamp)
 
         ohlc_asset_data = self.get_ohlc_data(
             asset_pair=asset_pair,
-            interval_in_minutes=self.collection_settings['query_period_in_minutes'],
-            starting_timestamp=since
+            interval_in_minutes=self.collection_settings['query_period_in_seconds'],
+            starting_timestamp=starting_timestamp
         )
 
         nbr_of_points = len(ohlc_asset_data)
@@ -182,7 +196,8 @@ class KrakenDataCollector:
         asset = [self.assets['asset']] * nbr_of_points
         currency = [self.assets['currency']] * nbr_of_points
 
-        new_data_df = self.build_ohlc_df_from_dict(
+        new_data_df = build_df_from_schema_and_data(
+            schema=self.ohlc_data_settings['schema'],
             data=[
                 asset_pair, wsname, asset, currency, asset_time_list,
                 asset_tmsp_list, asset_open_price, asset_close_price, asset_volume
@@ -190,20 +205,6 @@ class KrakenDataCollector:
         )
         data = pd.concat([existing_data_df, new_data_df])
         return data
-
-    def build_ohlc_df_from_dict(self, data: List[List]) -> pd.DataFrame:
-        """Build dataframe using a schema and a corresponding list of data
-        :param data: list of
-        :return:
-        """
-        if self.ohlc_data_settings['schema'] != len(data):
-            raise IncompleteDataForZipping
-        if len(set([len(lst) for lst in data])) != 1:
-            raise NotConsistentDataForDataframe
-        data_dict = dict(zip(self.ohlc_data_settings['schema'], data))
-        df = pd.DataFrame.from_dict(data_dict)
-
-        return df
 
     def get_differential_ohlc_data(self, existing_data_df: pd.DataFrame) -> pd.DataFrame:
         """Merge data collected from Kraken API, for all the assets targeted.
