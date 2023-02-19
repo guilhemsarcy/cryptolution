@@ -2,12 +2,14 @@
 
 from modules.models.collect_data import KrakenDataCollector
 import pytest
+import numpy as np
 from unittest.mock import MagicMock
 
 
 @pytest.fixture
 def kraken_data_collector():
     return KrakenDataCollector(
+        collection_settings=dict(query_period_in_minutes='60'),
         kraken_client=MagicMock()
     )
 
@@ -81,3 +83,10 @@ class TestCleanAssets:
         }
 
 
+class TestGetData:
+
+    def test_compute_starting_timestamp_nan(self, kraken_data_collector):
+        assert kraken_data_collector.compute_starting_timestamp(np.nan) == 0
+
+    def test_compute_starting_timestamp_not_nan(self, kraken_data_collector):
+        assert kraken_data_collector.compute_starting_timestamp(40) == 100

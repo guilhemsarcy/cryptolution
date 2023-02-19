@@ -2,10 +2,8 @@ if __name__ == '__main__':
     from modules.models.collect_data import KrakenDataCollector
     from modules.models.utils import read_csv_as_df
     from modules.models.exceptions import FileTypeNotHandled, NoExistingFile, UnexpectedSchemaError
-    from modules.models.config import OHLC_DATA
     from modules.models.check_data import DataChecker
 
-    import math
     import time
     import pandas as pd
 
@@ -37,3 +35,4 @@ if __name__ == '__main__':
     data.to_csv(kdc.collection_settings["storage_path"], index=False)
     print(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Data available in s3")
 
+    kdc.perform_asset_pairs_file_update('data/pairs.json')

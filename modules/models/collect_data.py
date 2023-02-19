@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 from modules.models.config import COLLECTION_SETTINGS, OHLC_DATA
 import os
 import krakenex
 import pandas as pd
 import time
+import json
 from math import isnan
 from modules.models.config import Currency
 from modules.models.utils import build_df_from_schema_and_data, compute_max_for_given_filter
@@ -12,17 +13,19 @@ from modules.models.utils import build_df_from_schema_and_data, compute_max_for_
 
 class KrakenDataCollector:
     """
-
+    Class for data ingestion from Kraken API
     """
     def __init__(
             self,
             collection_settings: Dict[str, str] = COLLECTION_SETTINGS,
             ohlc_data_settings: Dict = OHLC_DATA,
+            update_asset_pairs_file: bool = False,
             kraken_client: krakenex.api.API = krakenex.API(key=os.environ.get('KRAKEN_KEY'))
     ):
         self.collection_settings = collection_settings
         self.ohlc_data_settings = ohlc_data_settings
         self.kraken_client = kraken_client
+        self.update_asset_pairs_file = update_asset_pairs_file
         self.assets = {}
 
     def get_assets(self) -> Dict:
@@ -127,7 +130,7 @@ class KrakenDataCollector:
         )
         return ohlc_data['result'][asset_pair]
 
-    def compute_starting_timestamp(self, last_tmsp: int) -> int:
+    def compute_starting_timestamp(self, last_tmsp: Union[int, float]) -> int:
         """
         Compute the next starting timestamp based of provided timestamp and config
 
@@ -135,7 +138,7 @@ class KrakenDataCollector:
         :return: next starting timestamp
         """
         if not isnan(last_tmsp):
-            since = last_tmsp + int(self.collection_settings['query_period_in_seconds'])
+            since = last_tmsp + int(self.collection_settings['query_period_in_minutes'])
         else:
             since = 0
         return since
@@ -162,7 +165,7 @@ class KrakenDataCollector:
 
         ohlc_asset_data = self.get_ohlc_data(
             asset_pair=asset_pair,
-            interval_in_minutes=self.collection_settings['query_period_in_seconds'],
+            interval_in_minutes=self.collection_settings['query_period_in_minutes'],
             starting_timestamp=starting_timestamp
         )
 
@@ -170,37 +173,37 @@ class KrakenDataCollector:
         asset_time_list = [
             time.strftime(
                 '%Y-%m-%d %H:%M:%S',
-                time.localtime(ohlc_asset_data[i][self.ohlc_data_settings['timestamp']])
+                time.localtime(ohlc_asset_data[i][self.ohlc_data_settings['data_index']['timestamp']])
             )
             for i in range(nbr_of_points)
         ]  # raw period
         asset_tmsp_list = [
-            ohlc_asset_data[i][self.ohlc_data_settings['timestamp']]
+            ohlc_asset_data[i][self.ohlc_data_settings['data_index']['timestamp']]
             for i in range(nbr_of_points)
         ]
-        asset_open_price = [
-            ohlc_asset_data[i][self.ohlc_data_settings['opening_price']]
+        asset_open_prices = [
+            ohlc_asset_data[i][self.ohlc_data_settings['data_index']['opening_price']]
             for i in range(nbr_of_points)
         ]  # price at the beginning of the period
-        asset_close_price = [
-            ohlc_asset_data[i][self.ohlc_data_settings['ending_price']]
+        asset_close_prices = [
+            ohlc_asset_data[i][self.ohlc_data_settings['data_index']['ending_price']]
             for i in range(nbr_of_points)
         ]  # price at the end of the period
-        asset_volume = [
-            ohlc_asset_data[i][self.ohlc_data_settings['volume']]
+        asset_volumes = [
+            ohlc_asset_data[i][self.ohlc_data_settings['data_index']['volume']]
             for i in range(nbr_of_points)
         ]  # number of shares traded
 
-        asset_pair = [asset_pair] * nbr_of_points
-        wsname = [self.assets['wsname']] * nbr_of_points
-        asset = [self.assets['asset']] * nbr_of_points
-        currency = [self.assets['currency']] * nbr_of_points
+        asset_pairs = [asset_pair] * nbr_of_points
+        wsnames = [self.assets[asset_pair]['wsname']] * nbr_of_points
+        assets = [self.assets[asset_pair]['asset']] * nbr_of_points
+        currencies = [self.assets[asset_pair]['currency']] * nbr_of_points
 
         new_data_df = build_df_from_schema_and_data(
             schema=self.ohlc_data_settings['schema'],
             data=[
-                asset_pair, wsname, asset, currency, asset_time_list,
-                asset_tmsp_list, asset_open_price, asset_close_price, asset_volume
+                asset_pairs, wsnames, assets, currencies, asset_time_list,
+                asset_tmsp_list, asset_open_prices, asset_close_prices, asset_volumes
             ]
         )
         data = pd.concat([existing_data_df, new_data_df])
@@ -220,3 +223,13 @@ class KrakenDataCollector:
             data = pd.concat([data, asset_data])
 
         return data
+
+    def perform_asset_pairs_file_update(self, file_path: str) -> None:
+        """
+        Update asset pairs file if required
+
+        :param file_path: full path of the file we want to overwrite
+        """
+        if self.update_asset_pairs_file:
+            with open(file_path, 'w') as jsn:
+                json.dump(self.assets, jsn, sort_keys=True, indent=4)

@@ -2,7 +2,7 @@
 
 import datetime as dt
 import json
-from modules.data import mapping_status
+from modules.app.settings import mapping_status
 from datetime import timedelta
 from os import getenv
 
@@ -21,7 +21,7 @@ server = app.server
 
 result_ohlc = pd.read_csv("s3://cryptolution/data.csv")
 
-with open('modules/data/pairs.json') as json_pairs:
+with open('../data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
     # hotfix!
     pairs.pop("AUDUSD", None)
@@ -35,7 +35,7 @@ with open('modules/data/pairs.json') as json_pairs:
 currency_options = ['EUR', 'USD']
 dropdown_currency_options = [{'label': c, 'value': c} for c in currency_options]
 
-with open('modules/assets_mapping/mapping.json') as json_mapping_file:
+with open('../assets_mapping/mapping.json') as json_mapping_file:
     mapping = json.load(json_mapping_file)
 assets = [a for a in pairs]
 assets.sort()

@@ -25,7 +25,7 @@ def collect_data(settings: dict = COLLECTION_SETTINGS, update_pairs: bool = Fals
 
     kraken = krakenex.API(key=f"{os.environ.get('KRAKEN_KEY', None)}")
 
-    interval_in_minutes = settings['query_period_in_seconds']
+    interval_in_minutes = settings['query_period_in_minutes']
     result_ohlc = pd.DataFrame(columns=['asset_pair', 'wsname', 'asset', 'currency',
                                         'time', 'tmsp', 'open_price', 'close_price', 'volume'])
 
