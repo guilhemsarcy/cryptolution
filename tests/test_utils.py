@@ -1,12 +1,16 @@
 """Tests for utils"""
 
-import pytest
-import pandas as pd
-from pandas.testing import assert_frame_equal
 import math
 
-from modules.models.exceptions import FileTypeNotHandled, NotConsistentDataForDataframe, AccessDataframeFieldFailure
-from modules.models.utils import read_csv_as_df, build_df_from_schema_and_data, compute_max_for_given_filter
+import pandas as pd
+import pytest
+from pandas.testing import assert_frame_equal
+
+from modules.models.exceptions import (AccessDataframeFieldFailure,
+                                       FileTypeNotHandled,
+                                       NotConsistentDataForDataframe)
+from modules.models.utils import (build_df_from_schema_and_data,
+                                  compute_max_for_given_filter, read_csv_as_df)
 
 
 class TestReadCsv:

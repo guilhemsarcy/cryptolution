@@ -1,19 +1,26 @@
+"""
+Module for python utils.
+"""
 
-from typing import List, Union, Any
+
+from typing import Any, List, Union
+
 import pandas as pd
 
-from modules.models.exceptions import (
-    NoExistingFile, FileTypeNotHandled, NotConsistentDataForDataframe, AccessDataframeFieldFailure
-)
+from modules.models.exceptions import (AccessDataframeFieldFailure,
+                                       FileTypeNotHandled, NoExistingFile,
+                                       NotConsistentDataForDataframe)
 
 
 def read_csv_as_df(path: str) -> pd.DataFrame:
-    """Read csv as dataframe. Path can be anything : local, s3 url ...
+    """
+    Read csv as dataframe. Path can be anything : local, s3 url etc.
 
     :param path: path of the file
     :return: dataframe
     :raises NoExistingFile: if file does not exist
     """
+
     if '.csv' not in path:
         raise FileTypeNotHandled(path)
 
@@ -23,24 +30,18 @@ def read_csv_as_df(path: str) -> pd.DataFrame:
         raise NoExistingFile(path=path)
 
 
-def load_df_to_csv(df: pd.DataFrame, path: str) -> None:
-    """Load dataframe to csv
-
-    :param df: dataframe to load
-    :param path: path of the file
-    """
-    pass
-
-
 def build_df_from_schema_and_data(schema: List[str], data: List[List]) -> pd.DataFrame:
-    """Build dataframe using a list of data.
-    Example:
+    """
+    Build dataframe using a list of data.
+
+    Example: \
     data = [[1, 2], ["A", "B"]], the corresponding schema has to be something like ["field_1", "field_2"]
 
     :param schema: data schema
     :param data: list of data to be mapped with schema
     :return: the dataframe built from schema and data
     """
+
     if len(schema) != len(data) or len(set([len(lst) for lst in data])) != 1:
         raise NotConsistentDataForDataframe(schema=schema)
     data_dict = dict(zip(schema, data))
@@ -56,7 +57,7 @@ def compute_max_for_given_filter(
         filter_value: Any,
 ) -> Union[int, float]:
     """
-    Compute the max value of a given field in a df after filtering
+    Compute the max value of a given field in a df after filtering.
 
     :param df: the provided df
     :param maxed_field: name of the df field we base the max on
@@ -65,6 +66,7 @@ def compute_max_for_given_filter(
 
     :return: the max value
     """
+
     if list({maxed_field, filter_field} - set(df.columns)):
         raise AccessDataframeFieldFailure(field_candidates=[maxed_field, filter_field])
     max_value = df[df[filter_field] == filter_value][maxed_field].max()

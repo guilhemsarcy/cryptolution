@@ -1,15 +1,20 @@
+"""
+Data collection from Kraken.
+"""
+
 from __future__ import annotations
-from typing import Dict, Optional, Union
-from modules.models.config import COLLECTION_SETTINGS, OHLC_DATA
-import os
-import krakenex
-import pandas as pd
-import time
+
 import json
 import logging
+import os
 from math import isnan
-from modules.models.config import Currency
-from modules.models.utils import build_df_from_schema_and_data, compute_max_for_given_filter
+from typing import Dict, Optional, Union
+
+import krakenex
+
+from modules.models.config import COLLECTION_SETTINGS, OHLC_DATA, Currency
+from modules.models.utils import (build_df_from_schema_and_data,
+                                  compute_max_for_given_filter)
 
 logger = logging.getLogger('collect data')
 logging.basicConfig(level=logging.INFO)
@@ -17,8 +22,9 @@ logging.basicConfig(level=logging.INFO)
 
 class KrakenDataCollector:
     """
-    Class for data ingestion from Kraken API
+    Class for data ingestion from Kraken API.
     """
+
     def __init__(
             self,
             collection_settings: Dict[str, str] = COLLECTION_SETTINGS,
@@ -33,7 +39,9 @@ class KrakenDataCollector:
         self.assets = {}
 
     def get_assets(self) -> Dict:
-        """Collect asset pairs from Kraken API.
+        """
+        Collect asset pairs from Kraken API.
+
         The API returns an object with this pattern:
         {
             "1INCHEUR": {
@@ -57,7 +65,8 @@ class KrakenDataCollector:
             raw_api_assets_pairs: Dict,
             keep_common_currencies: Optional[bool] = True
     ) -> None:
-        """Prepare asset pairs & apply some filters.
+        """
+        Prepare asset pairs & apply some filters.
 
         :param raw_api_assets_pairs: payload provided by Kraken API when asking for asset pairs
         :param keep_common_currencies: whether we should only keep most common currencies.
@@ -88,7 +97,9 @@ class KrakenDataCollector:
             interval_in_minutes: str,
             starting_timestamp: int
     ) -> Dict:
-        """Collect OHLC (movement of prices) data from Kraken API.
+        """
+        Collect OHLC (movement of prices) data from Kraken API.
+
         The API returns an object with this pattern:
         {
             'error': [],
@@ -136,7 +147,7 @@ class KrakenDataCollector:
 
     def compute_starting_timestamp(self, last_tmsp: Union[int, float]) -> int:
         """
-        Compute the next starting timestamp based of provided timestamp and config
+        Compute the next starting timestamp based of provided timestamp and config.
 
         :param last_tmsp: last timestamp registered
         :return: next starting timestamp
@@ -152,7 +163,8 @@ class KrakenDataCollector:
             asset_pair: str,
             existing_data_df: pd.DataFrame
     ) -> pd.DataFrame:
-        """Collect data from Kraken API, starting from last ingested data for each asset pair.
+        """
+        Collect data from Kraken API, starting from last ingested data for each asset pair.
 
         :param asset_pair: targeted asset pair
         :param existing_data_df: existing data (already ingested)
@@ -214,7 +226,8 @@ class KrakenDataCollector:
         return data
 
     def get_differential_ohlc_data(self, existing_data_df: pd.DataFrame) -> pd.DataFrame:
-        """Merge data collected from Kraken API, for all the assets targeted.
+        """
+        Merge data collected from Kraken API, for all the assets targeted.
 
         :param existing_data_df: existing data (already ingested)
         :return: the concatened data
@@ -233,10 +246,57 @@ class KrakenDataCollector:
 
     def perform_asset_pairs_file_update(self, file_path: str) -> None:
         """
-        Update asset pairs file if required
+        Update asset pairs file if required.
 
         :param file_path: full path of the file we want to overwrite
         """
         if self.update_asset_pairs_file:
             with open(file_path, 'w') as jsn:
                 json.dump(self.assets, jsn, sort_keys=True, indent=4)
+
+
+if __name__ == '__main__':
+    import logging
+    import time
+
+    import pandas as pd
+
+    from modules.models.check_data import DataChecker
+    from modules.models.exceptions import (FileTypeNotHandled, NoExistingFile,
+                                           UnexpectedSchemaError)
+    from modules.models.utils import read_csv_as_df
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO)
+
+    kdc = KrakenDataCollector()
+    raw_assets = kdc.get_assets()
+    kdc.clean_assets(raw_assets)
+
+    try:
+        existing_df = read_csv_as_df(path=kdc.collection_settings['storage_path'])
+    except (FileTypeNotHandled, NoExistingFile) as err:
+        logger.error(
+            f"{err}"
+        )
+        existing_df = pd.DataFrame(
+            columns=kdc.ohlc_data_settings['schema']
+        )
+
+    data_checker = DataChecker(df=existing_df)
+    try:
+        data_checker.check_schema(schema=kdc.ohlc_data_settings['schema'])
+    except UnexpectedSchemaError as err:
+        logger.error(
+            f"{err}"
+        )
+        existing_df = pd.DataFrame(
+            columns=kdc.ohlc_data_settings['schema']
+        )
+
+    df = kdc.get_differential_ohlc_data(existing_data_df=existing_df)
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Pushing data to s3")
+    df.to_csv(kdc.collection_settings["storage_path"], index=False)
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Data available in s3")
+
+    kdc.perform_asset_pairs_file_update('data/pairs.json')
