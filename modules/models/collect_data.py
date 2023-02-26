@@ -6,9 +6,13 @@ import krakenex
 import pandas as pd
 import time
 import json
+import logging
 from math import isnan
 from modules.models.config import Currency
 from modules.models.utils import build_df_from_schema_and_data, compute_max_for_given_filter
+
+logger = logging.getLogger('collect data')
+logging.basicConfig(level=logging.INFO)
 
 
 class KrakenDataCollector:
@@ -217,10 +221,13 @@ class KrakenDataCollector:
         """
         data = pd.DataFrame()
         for asset in self.assets:
+            logger.info(
+                f"{time.strftime('%Y-%m-%d %H:%M:%S')} : trying to collect data for asset pair {asset}"
+            )
             asset_data = self.get_differential_ohlc_asset_data(
                 asset_pair=asset, existing_data_df=existing_data_df
             )
-            data = pd.concat([data, asset_data])
+            data = pd.concat([data, asset_data]).copy()
 
         return data
 
