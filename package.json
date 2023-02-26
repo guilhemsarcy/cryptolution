@@ -1,6 +1,6 @@
 {
   "name": "cryptolution",
-  "version": "0.4",
+  "version": "1.0",
   "description": "Dash app for cryptocurrency market",
   "main": "app.py",
   "author": "Guilhem",
@@ -8,7 +8,6 @@
   "dependencies": {
     "dash": "1.18.1",
      "pandas": "1.2.0",
-     "plotly": "4.14.3",
-     "gunicorn": "20.0.4"
+     "plotly": "4.14.3"
   }
 }
