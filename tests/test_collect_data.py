@@ -1,9 +1,11 @@
 """Tests for data collection from Kraken"""
 
-from modules.models.collect_data import KrakenDataCollector
-import pytest
-import numpy as np
 from unittest.mock import MagicMock
+
+import numpy as np
+import pytest
+
+from modules.models.collect_data import KrakenDataCollector
 
 
 @pytest.fixture

@@ -2,7 +2,6 @@
 
 import datetime as dt
 import json
-from modules.app.settings import mapping_status
 from datetime import timedelta
 from os import getenv
 
@@ -11,6 +10,8 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+
+from modules.app.settings import mapping_status
 
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
@@ -275,33 +276,33 @@ def update_graph(selected_asset, selected_currency, selected_measure, selected_s
     :rtype: Dict
     """
     filtered_df = result_ohlc[
-        (result_ohlc.asset_pair == selected_asset)
-        & (result_ohlc.currency == selected_currency)
-        & (result_ohlc.time >= selected_start_date)
-        & (result_ohlc.time <= selected_end_date)
+        (result_ohlc.asset_pair == selected_asset) &
+        (result_ohlc.currency == selected_currency) &
+        (result_ohlc.time >= selected_start_date) &
+        (result_ohlc.time <= selected_end_date)
     ]
     symbol = '€'
     if selected_currency != 'EUR':
         symbol = '$'
 
     return {
-                'data': [{'x': filtered_df['time'],
-                          'y': filtered_df[selected_measure],
-                          'mode': 'lines',
-                          'line': dict(color='#749ce1', line=dict(width=5))
-                          }],
-                'layout': {
-                    'plot_bgcolor': colors['background'],
-                    'paper_bgcolor': colors['background'],
-                    'font': {
-                        'color': colors['text']
-                    },
-                    'height': 600,
-                    'yaxis': {
-                        "ticksuffix": f"{symbol}",
-                    }
-                }
+        'data': [{'x': filtered_df['time'],
+                  'y': filtered_df[selected_measure],
+                  'mode': 'lines',
+                  'line': dict(color='#749ce1', line=dict(width=5))
+                  }],
+        'layout': {
+            'plot_bgcolor': colors['background'],
+            'paper_bgcolor': colors['background'],
+            'font': {
+                'color': colors['text']
+            },
+            'height': 600,
+            'yaxis': {
+                "ticksuffix": f"{symbol}",
             }
+        }
+    }
 
 
 if __name__ == '__main__':

@@ -1,10 +1,11 @@
 
-from typing import List, Union, Any
+from typing import Any, List, Union
+
 import pandas as pd
 
-from modules.models.exceptions import (
-    NoExistingFile, FileTypeNotHandled, NotConsistentDataForDataframe, AccessDataframeFieldFailure
-)
+from modules.models.exceptions import (AccessDataframeFieldFailure,
+                                       FileTypeNotHandled, NoExistingFile,
+                                       NotConsistentDataForDataframe)
 
 
 def read_csv_as_df(path: str) -> pd.DataFrame:

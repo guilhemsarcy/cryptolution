@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v1.2.3
+    rev: v2.0.0
     hooks:
     - id: flake8
       args: ['--ignore=E501,W504,W605']
@@ -10,3 +10,11 @@ repos:
     hooks:
     - id: isort
       language_version: python3.7
+-   repo: https://github.com/pycqa/pydocstyle
+    rev: 4.0.0
+    hooks:
+    -   id: pydocstyle
+        args:
+          - --ignore=D107,D202,D212
+          - --match='(?!__init).*\.py'
+          - --match-dir='[^\tests].*'

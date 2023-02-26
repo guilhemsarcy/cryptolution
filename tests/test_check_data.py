@@ -1,7 +1,7 @@
 """Tests for data checks"""
 
-import pytest
 import pandas as pd
+import pytest
 
 from modules.models.check_data import DataChecker
 from modules.models.exceptions import UnexpectedSchemaError

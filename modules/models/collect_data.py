@@ -1,15 +1,16 @@
 from __future__ import annotations
-from typing import Dict, Optional, Union
-from modules.models.config import COLLECTION_SETTINGS, OHLC_DATA
-import os
-import krakenex
-import pandas as pd
-import time
+
 import json
 import logging
+import os
 from math import isnan
-from modules.models.config import Currency
-from modules.models.utils import build_df_from_schema_and_data, compute_max_for_given_filter
+from typing import Dict, Optional, Union
+
+import krakenex
+
+from modules.models.config import COLLECTION_SETTINGS, OHLC_DATA, Currency
+from modules.models.utils import (build_df_from_schema_and_data,
+                                  compute_max_for_given_filter)
 
 logger = logging.getLogger('collect data')
 logging.basicConfig(level=logging.INFO)
@@ -240,3 +241,50 @@ class KrakenDataCollector:
         if self.update_asset_pairs_file:
             with open(file_path, 'w') as jsn:
                 json.dump(self.assets, jsn, sort_keys=True, indent=4)
+
+
+if __name__ == '__main__':
+    import logging
+    import time
+
+    import pandas as pd
+
+    from modules.models.check_data import DataChecker
+    from modules.models.exceptions import (FileTypeNotHandled, NoExistingFile,
+                                           UnexpectedSchemaError)
+    from modules.models.utils import read_csv_as_df
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO)
+
+    kdc = KrakenDataCollector()
+    raw_assets = kdc.get_assets()
+    kdc.clean_assets(raw_assets)
+
+    try:
+        existing_df = read_csv_as_df(path=kdc.collection_settings['storage_path'])
+    except (FileTypeNotHandled, NoExistingFile) as err:
+        logger.error(
+            f"{err}"
+        )
+        existing_df = pd.DataFrame(
+            columns=kdc.ohlc_data_settings['schema']
+        )
+
+    data_checker = DataChecker(df=existing_df)
+    try:
+        data_checker.check_schema(schema=kdc.ohlc_data_settings['schema'])
+    except UnexpectedSchemaError as err:
+        logger.error(
+            f"{err}"
+        )
+        existing_df = pd.DataFrame(
+            columns=kdc.ohlc_data_settings['schema']
+        )
+
+    df = kdc.get_differential_ohlc_data(existing_data_df=existing_df)
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Pushing data to s3")
+    df.to_csv(kdc.collection_settings["storage_path"], index=False)
+    logger.info(f"{time.strftime('%Y-%m-%d %H:%M:%S')} : Data available in s3")
+
+    kdc.perform_asset_pairs_file_update('data/pairs.json')
