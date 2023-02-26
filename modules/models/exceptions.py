@@ -1,11 +1,16 @@
+"""
+Custom exceptions.
+"""
+
 
 from typing import List
 
 
 class NoExistingFile(Exception):
     """
-    Exception raised when no file is found for a given path
+    Exception raised when no file is found for a given path.
     """
+
     def __init__(self, path: str):
         self.message = f"The file {path} does not exist!"
 
@@ -15,7 +20,7 @@ class NoExistingFile(Exception):
 
 class FileTypeNotHandled(Exception):
     """
-    Exception raised when the file cannot be handled
+    Exception raised when the file cannot be handled.
     """
 
     def __init__(self, path: str):
@@ -27,7 +32,7 @@ class FileTypeNotHandled(Exception):
 
 class UnexpectedSchemaError(Exception):
     """
-    Exception raised when the df schema is unexpected
+    Exception raised when the df schema is unexpected.
     """
 
     def __init__(self, expected_schema: List[str]):
@@ -40,6 +45,7 @@ class UnexpectedSchemaError(Exception):
 class NotConsistentDataForDataframe(Exception):
     """
     Exception raised when trying to build a dataframe regarding a schema with inconsistent data.
+
     The inconsistency can come from:
     - the number of data (for each field in the schema, it has to be the same)
     - the length of data regarding the schema (for each field in the schema, we have to provide some data)

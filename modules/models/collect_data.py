@@ -1,3 +1,7 @@
+"""
+Data collection from Kraken.
+"""
+
 from __future__ import annotations
 
 import json
@@ -18,8 +22,9 @@ logging.basicConfig(level=logging.INFO)
 
 class KrakenDataCollector:
     """
-    Class for data ingestion from Kraken API
+    Class for data ingestion from Kraken API.
     """
+
     def __init__(
             self,
             collection_settings: Dict[str, str] = COLLECTION_SETTINGS,
@@ -34,7 +39,9 @@ class KrakenDataCollector:
         self.assets = {}
 
     def get_assets(self) -> Dict:
-        """Collect asset pairs from Kraken API.
+        """
+        Collect asset pairs from Kraken API.
+
         The API returns an object with this pattern:
         {
             "1INCHEUR": {
@@ -58,7 +65,8 @@ class KrakenDataCollector:
             raw_api_assets_pairs: Dict,
             keep_common_currencies: Optional[bool] = True
     ) -> None:
-        """Prepare asset pairs & apply some filters.
+        """
+        Prepare asset pairs & apply some filters.
 
         :param raw_api_assets_pairs: payload provided by Kraken API when asking for asset pairs
         :param keep_common_currencies: whether we should only keep most common currencies.
@@ -89,7 +97,9 @@ class KrakenDataCollector:
             interval_in_minutes: str,
             starting_timestamp: int
     ) -> Dict:
-        """Collect OHLC (movement of prices) data from Kraken API.
+        """
+        Collect OHLC (movement of prices) data from Kraken API.
+
         The API returns an object with this pattern:
         {
             'error': [],
@@ -137,7 +147,7 @@ class KrakenDataCollector:
 
     def compute_starting_timestamp(self, last_tmsp: Union[int, float]) -> int:
         """
-        Compute the next starting timestamp based of provided timestamp and config
+        Compute the next starting timestamp based of provided timestamp and config.
 
         :param last_tmsp: last timestamp registered
         :return: next starting timestamp
@@ -153,7 +163,8 @@ class KrakenDataCollector:
             asset_pair: str,
             existing_data_df: pd.DataFrame
     ) -> pd.DataFrame:
-        """Collect data from Kraken API, starting from last ingested data for each asset pair.
+        """
+        Collect data from Kraken API, starting from last ingested data for each asset pair.
 
         :param asset_pair: targeted asset pair
         :param existing_data_df: existing data (already ingested)
@@ -215,7 +226,8 @@ class KrakenDataCollector:
         return data
 
     def get_differential_ohlc_data(self, existing_data_df: pd.DataFrame) -> pd.DataFrame:
-        """Merge data collected from Kraken API, for all the assets targeted.
+        """
+        Merge data collected from Kraken API, for all the assets targeted.
 
         :param existing_data_df: existing data (already ingested)
         :return: the concatened data
@@ -234,7 +246,7 @@ class KrakenDataCollector:
 
     def perform_asset_pairs_file_update(self, file_path: str) -> None:
         """
-        Update asset pairs file if required
+        Update asset pairs file if required.
 
         :param file_path: full path of the file we want to overwrite
         """

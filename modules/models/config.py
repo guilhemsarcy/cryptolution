@@ -1,11 +1,15 @@
 """
-Config for models
+Config for models.
 """
 
 from enum import Enum
 
 
 class Currency(Enum):
+    """
+    Enum for currencies.
+    """
+
     EURO = 'EUR'
     DOLLAR = 'USD'
 

@@ -166,7 +166,13 @@ app.layout = dbc.Container(
     dash.dependencies.Output('last_available_data', 'children'),
     dash.dependencies.Input('asset_choice', 'value')
 )
-def update_last_available_data(selected_asset):
+def update_last_available_data(selected_asset: str) -> str:
+    """
+    Get last available data.
+
+    :param selected_asset: targeted asset
+    :return: last available data
+    """
     try:
         return f"Last available data : {max(result_ohlc[result_ohlc.asset_pair == selected_asset].time)[:10]}"
     except ValueError:
@@ -178,6 +184,12 @@ def update_last_available_data(selected_asset):
     dash.dependencies.Input('asset_choice', 'value')
 )
 def update_status(selected_asset):
+    """
+    Get data update status.
+
+    :param selected_asset: targeted asset
+    :return: data update status (given the last available time)
+    """
     try:
         max_date_asset = max(result_ohlc[result_ohlc.asset_pair == selected_asset].time)[:10]
     except ValueError:
