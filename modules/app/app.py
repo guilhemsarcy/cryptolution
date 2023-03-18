@@ -10,8 +10,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
-
-from modules.app.settings import mapping_status
+from settings import mapping_status
 
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
@@ -22,7 +21,7 @@ server = app.server
 
 result_ohlc = pd.read_csv("s3://cryptolution/data.csv")
 
-with open('../data/pairs.json') as json_pairs:
+with open('modules/data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
     # hotfix!
     pairs.pop("AUDUSD", None)
@@ -36,7 +35,7 @@ with open('../data/pairs.json') as json_pairs:
 currency_options = ['EUR', 'USD']
 dropdown_currency_options = [{'label': c, 'value': c} for c in currency_options]
 
-with open('../assets_mapping/mapping.json') as json_mapping_file:
+with open('modules/assets_mapping/mapping.json') as json_mapping_file:
     mapping = json.load(json_mapping_file)
 assets = [a for a in pairs]
 assets.sort()
@@ -298,11 +297,14 @@ def update_graph(selected_asset, selected_currency, selected_measure, selected_s
         symbol = '$'
 
     return {
-        'data': [{'x': filtered_df['time'],
-                  'y': filtered_df[selected_measure],
-                  'mode': 'lines',
-                  'line': dict(color='#749ce1', line=dict(width=5))
-                  }],
+        'data': [
+            {
+                'x': filtered_df['time'],
+                'y': filtered_df[selected_measure],
+                'mode': 'lines',
+                'line': dict(color='#749ce1', line=dict(width=5))
+            }
+        ],
         'layout': {
             'plot_bgcolor': colors['background'],
             'paper_bgcolor': colors['background'],
