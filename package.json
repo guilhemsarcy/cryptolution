@@ -1,13 +1,11 @@
 {
   "name": "cryptolution",
-  "version": "1.0",
-  "description": "Dash app for cryptocurrency market",
+  "version": "2.0",
+  "description": "Streamlit app for cryptocurrency market",
   "main": "app.py",
   "author": "Guilhem",
   "python": "3.7",
   "dependencies": {
-    "dash": "1.18.1",
-     "pandas": "1.2.0",
-     "plotly": "4.14.3"
+    "streamlit": "1.15.0"
   }
 }

@@ -1,13 +1,7 @@
 pandas==1.2.0
 krakenex==2.1.0
-plotly==4.14.3
 requests==2.25.1
 beautifulsoup4==4.9.3
-dash==1.18.1
-dash-core-components==1.14.1
-dash-html-components==1.1.1
-dash-renderer==1.8.3
-dash-table==4.11.1
-dash-bootstrap-components==0.11.3
 s3fs==0.4.2
 boto3==1.13.11
+streamlit==1.15.0

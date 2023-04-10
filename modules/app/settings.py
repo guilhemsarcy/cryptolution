@@ -1,7 +1,22 @@
 """Settings for app."""
 
-mapping_status = {
-    'fresh': 'success',
-    'half_fresh': 'warning',
-    'rotten': 'danger'
-}
+from enum import Enum
+
+
+class Currencies(Enum):
+    """
+    Enum for currencies.
+    """
+
+    EUR = '€'
+    USD = '$'
+
+
+class Metrics(Enum):
+    """
+    Enum for metrics.
+    """
+
+    OPEN_PRICE = 'open_price'
+    CLOSE_PRICE = 'close_price'
+    VOLUME = 'volume'
