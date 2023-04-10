@@ -8,6 +8,7 @@ from os import getenv
 import altair as alt
 import pandas as pd
 import streamlit as st
+from settings import CURRENCY_DISPLAY
 from view import CryptolutionView
 
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
@@ -15,15 +16,6 @@ AWS_SECRET_ACCESS_KEY = getenv('AWS_SECRET_ACCESS_KEY')
 
 st.set_page_config()
 st.title('Cryptolution')
-
-
-CURRENCY_DISPLAY = {
-    'EUR': '€',
-    'USD': '$'
-}
-
-
-cryptolution_view = CryptolutionView(title='Cryptolution')
 
 
 @st.cache
@@ -40,28 +32,17 @@ def get_historical_market_data() -> pd.DataFrame:
 data = get_historical_market_data()
 with open('modules/data/pairs.json') as json_pairs:
     pairs = json.load(json_pairs)
-    pairs.pop("AUDUSD", None)
-    pairs.pop("ZEURZUSD", None)
-    pairs.pop("ZGBPZUSD", None)
-    pairs.pop("KEEPEUR", None)
-    pairs.pop("KEEPUSD", None)
-    pairs.pop("XREPZEUR", None)
-    pairs.pop("XREPZUSD", None)
 
 with open('modules/assets_mapping/mapping.json') as json_mapping_file:
-    mapping = json.load(json_mapping_file)
+    asset_name_mapping = json.load(json_mapping_file)
 
-asset_list_raw = [pairs[asset_pair]['asset'] for asset_pair in pairs]
-asset_list_business = [mapping[a] for a in asset_list_raw]
-
-cryptolution_view.overview(
-    header_title='Overview',
-    metrics=[
-        {"Number of cryptocurrencies": f"#{len(set(data.asset.values).intersection(asset_list_raw))}"},
-        {"Date min handled": data.time.min()[:10]},
-        {"Date max handled": data.time.max()[:10]}
-    ]
+cryptolution_view = CryptolutionView(
+    title='Cryptolution',
+    data=data,
+    pairs=pairs,
+    asset_name_mapping=asset_name_mapping
 )
+cryptolution_view.overview()
 
 # Sidebar
 st.sidebar.title("Settings")
@@ -73,11 +54,11 @@ currency_options = st.sidebar.selectbox(
 
 asset_options = st.sidebar.selectbox(
     'Select the asset',
-    sorted(tuple(set(asset_list_business)))
+    sorted(tuple(set(cryptolution_view.asset_list_business)))
 )
 asset_disabled = st.sidebar.text_input(
     'Selected asset (technical)',
-    [k for k, v in mapping.items() if v == asset_options][0],
+    [k for k, v in asset_name_mapping.items() if v == asset_options][0],
     disabled=True
 )
 
