@@ -8,7 +8,6 @@ from os import getenv
 import altair as alt
 import pandas as pd
 import streamlit as st
-from settings import CURRENCY_DISPLAY
 from view import CryptolutionView
 
 AWS_ACCESS_KEY_ID = getenv('AWS_ACCESS_KEY_ID')
@@ -44,29 +43,11 @@ cryptolution_view = CryptolutionView(
 )
 cryptolution_view.overview()
 
-# Sidebar
-st.sidebar.title("Settings")
-st.sidebar.markdown('###')
-currency_options = st.sidebar.selectbox(
-    'Select the currency',
-    ('EUR', 'USD')
-)
-
-asset_options = st.sidebar.selectbox(
-    'Select the asset',
-    sorted(tuple(set(cryptolution_view.asset_list_business)))
-)
-asset_disabled = st.sidebar.text_input(
-    'Selected asset (technical)',
-    [k for k, v in asset_name_mapping.items() if v == asset_options][0],
-    disabled=True
-)
-
-metric_options = st.sidebar.selectbox(
-    'Select the metric',
-    ('open_price', 'close_price', 'volume')
-)
-
+sidebar = cryptolution_view.sidebar()
+currency_options = sidebar["currency_options"]
+asset_options = sidebar["asset_options"]
+asset_disabled = sidebar["asset_disabled"]
+metric_options = sidebar["metric_options"]
 
 st.header('Explore historical data')
 
@@ -86,7 +67,7 @@ line_chart = (
     .mark_line()
     .encode(
         x=alt.X("date:T", axis=alt.Axis(title="date", titleColor='#57A44C')),
-        y=alt.Y(metric_options, axis=alt.Axis(title=f'{metric_options} ({CURRENCY_DISPLAY[currency_options]})', titleColor='#57A44C'))
+        y=alt.Y(metric_options, axis=alt.Axis(title=f'{metric_options} ({currency_options})', titleColor='#57A44C'))
     )
 ).add_selection(
     brush
@@ -106,7 +87,7 @@ zoomed_chart = (
     .mark_line()
     .encode(
         x=alt.X("date:T", axis=alt.Axis(title="date", titleColor='#57A44C')),
-        y=alt.Y(metric_options, axis=alt.Axis(title=f'{metric_options} ({CURRENCY_DISPLAY[currency_options]})', titleColor='#57A44C'))
+        y=alt.Y(metric_options, axis=alt.Axis(title=f'{metric_options} ({currency_options})', titleColor='#57A44C'))
     )
 ).transform_filter(
     brush
