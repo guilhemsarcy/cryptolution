@@ -49,11 +49,6 @@
         "currency": "USD",
         "wsname": "ATOM/USD"
     },
-    "AUDUSD": {
-        "asset": "AUD",
-        "currency": "USD",
-        "wsname": "AUD/USD"
-    },
     "BALEUR": {
         "asset": "BAL",
         "currency": "EUR",
@@ -213,16 +208,6 @@
         "asset": "KAVA",
         "currency": "USD",
         "wsname": "KAVA/USD"
-    },
-    "KEEPEUR": {
-        "asset": "KEEP",
-        "currency": "EUR",
-        "wsname": "KEEP/EUR"
-    },
-    "KEEPUSD": {
-        "asset": "KEEP",
-        "currency": "USD",
-        "wsname": "KEEP/USD"
     },
     "KNCEUR": {
         "asset": "KNC",
@@ -484,16 +469,6 @@
         "currency": "USD",
         "wsname": "MLN/USD"
     },
-    "XREPZEUR": {
-        "asset": "REP",
-        "currency": "EUR",
-        "wsname": "REP/EUR"
-    },
-    "XREPZUSD": {
-        "asset": "REP",
-        "currency": "USD",
-        "wsname": "REP/USD"
-    },
     "XTZEUR": {
         "asset": "XTZ",
         "currency": "EUR",
@@ -563,15 +538,5 @@
         "asset": "YFI",
         "currency": "USD",
         "wsname": "YFI/USD"
-    },
-    "ZEURZUSD": {
-        "asset": "EUR",
-        "currency": "USD",
-        "wsname": "EUR/USD"
-    },
-    "ZGBPZUSD": {
-        "asset": "GBP",
-        "currency": "USD",
-        "wsname": "GBP/USD"
     }
 }
