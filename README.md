@@ -10,7 +10,7 @@
 
 The work is divided into two main parts : 
 - collecting and cleaning data from Kraken API
-- visualizing these data with an interactive Python App (Dash)
+- visualizing these data with an interactive Python App (Streamlit framework)
 
 # Setup for local use
 
@@ -18,14 +18,15 @@ The work is divided into two main parts :
 
 Example using conda : 
 ```
-conda create -n cryptolution python=3.7
+conda create -n cryptolution python=3.9
 conda activate cryptolution
 pip install -r requirements.txt
+pip install -r requirements_dev.txt
 ```
 
 ## Run the app
 ```
-python modules/app/app.py
+streamlit run modules/app/app.py
 ```
 
 ## Access the app locally
