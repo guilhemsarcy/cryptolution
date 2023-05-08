@@ -34,4 +34,4 @@ Go to : http://127.0.0.1:8050/ (default)
 
 
 App screenshot :
-![alt text](https://github.com/guilhemsarcy/cryptolution/blob/master/other/dashboard.JPG?raw=true)
+![alt text](https://github.com/guilhemsarcy/cryptolution/blob/master/other/dashboard.png?raw=true)
