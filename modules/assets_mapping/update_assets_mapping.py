@@ -7,35 +7,28 @@ from bs4 import BeautifulSoup
 
 def update_assets_mapping() -> dict:
     """
-    Scrap coinmarketcap.com and get labels associated to currency codes.
+    Scrap investing.com and get labels associated to currency symbols.
 
     :return: a mapping between currency code and label
     """
-    res = requests.get("https://coinmarketcap.com/all/views/all/")
-    res.raise_for_status()
+    res = requests.get("https://www.investing.com/crypto/currencies")
 
     soup = BeautifulSoup(res.text, "html.parser")
-    table = soup.find_all('table')[2]
+    data = soup.find_all('tr')
+    cryptos = []
 
-    rows = list()
-    for row in table.findAll("tr")[1:]:
-        rows.append(row)
+    for crypto in data[1:]:  # skip the header
+        cryptos.append(
+            {
+                "symbol": crypto.find(class_="left noWrap elp symb js-currency-symbol")["title"],
+                "name": crypto.find(class_="left bold elp name cryptoName first js-currency-name")["title"]
+            }
+        )
 
-    mp = {}
-    for r in rows:
-        value = r.find_all('td')
-        mp[value[2].text] = value[1].text
-
-    # tweaks
-    mp['TBTC'] = 'Bitcoin'
-    mp['XBT'] = 'Bitcoin'
-    mp['REPV2'] = mp['REP']
-    del mp['REP']
-    mp['XDG'] = mp['DOGE']
-    del mp['DOGE']
-    mp['MLN'] = 'Melon'
-    mp['PAXG'] = 'Pax gold'
-    return mp
+    return {
+        item['symbol']: item['name']
+        for item in cryptos
+    }
 
 
 if __name__ == '__main__':
