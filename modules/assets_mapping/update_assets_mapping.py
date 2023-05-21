@@ -3,6 +3,7 @@ import json
 
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import ResultSet
 
 from dataclasses import dataclass
 from modules.models.exceptions import UnknownURLError, WrongFormatForHTML, NotExistingHTMLClass
@@ -36,7 +37,7 @@ class AssetMappingUpdater:
             raise WrongFormatForHTML
         self.soup = soup
 
-    def build_mapping(self, table: BeautifulSoup):
+    def build_mapping(self, table: ResultSet):
         """
         Build mapping from scraping.
         """

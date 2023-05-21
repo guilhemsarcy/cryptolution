@@ -19,8 +19,14 @@ class TestAssetMappingUpdater:
         with pytest.raises(UnknownURLError):
             asset_mapping_updater.get_html()
 
-    def test_soupify_wrong_html(self, asset_mapping_updater):
-        asset_mapping_updater.html = 'wrong html'
+    def test_soupify_html(self, asset_mapping_updater):
+        asset_mapping_updater.html = "<html><body><h1>Good html!</h1></body></html>"
+        asset_mapping_updater.soupify_html()
+
+        assert isinstance(asset_mapping_updater.soup, BeautifulSoup)
+
+    def test_soupify_html_wrong_html(self, asset_mapping_updater):
+        asset_mapping_updater.html = 'Wrong html!'
         with pytest.raises(WrongFormatForHTML):
             asset_mapping_updater.soupify_html()
 
@@ -28,6 +34,32 @@ class TestAssetMappingUpdater:
         asset_mapping_updater.html = '<a class="a">good html</a>'
         asset_mapping_updater.soupify_html()
         assert asset_mapping_updater.soup.text == 'good html'
+
+    def test_build_mapping(self, asset_mapping_updater):
+        soup = BeautifulSoup('''
+                <table>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Name</th>
+                    </tr>
+                    <tr>
+                        <td class="left noWrap elp symb js-currency-symbol" title="BTC">BTC</td>
+                        <td class="left bold elp name cryptoName first js-currency-name" title="Bitcoin">Bitcoin</td>
+                    </tr>
+                    <tr>
+                        <td class="left noWrap elp symb js-currency-symbol" title="ETH">ETH</td>
+                        <td class="left bold elp name cryptoName first js-currency-name" title="Ethereum">Ethereum</td>
+                    </tr>
+                </table>
+            ''', 'html.parser')
+
+        asset_mapping_updater.build_mapping(soup.find_all('tr'))
+
+        expected_mapping = {
+            'BTC': 'Bitcoin',
+            'ETH': 'Ethereum'
+        }
+        assert asset_mapping_updater.mapping == expected_mapping
 
     @staticmethod
     def test_find_from_soup_not_existing_class():
