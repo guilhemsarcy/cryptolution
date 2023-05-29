@@ -89,7 +89,7 @@ class WrongFormatForHTML(Exception):
     """
 
     def __init__(self):
-        self.message = f'Error trying to soupify html code.'
+        self.message = 'Error trying to soupify html code.'
 
     def __str__(self):
         return self.message

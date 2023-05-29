@@ -1,9 +1,10 @@
 import pytest
+from bs4 import BeautifulSoup
 
 from modules.assets_mapping.update_assets_mapping import AssetMappingUpdater
-from modules.models.exceptions import UnknownURLError, WrongFormatForHTML, NotExistingHTMLClass
+from modules.models.exceptions import (NotExistingHTMLClass, UnknownURLError,
+                                       WrongFormatForHTML)
 
-from bs4 import BeautifulSoup
 
 @pytest.fixture
 def asset_mapping_updater():

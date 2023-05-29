@@ -1,17 +1,19 @@
 """Script for scrapping explicit names from raw currency codes."""
 import json
+from dataclasses import dataclass
 
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import ResultSet
 
-from dataclasses import dataclass
-from modules.models.exceptions import UnknownURLError, WrongFormatForHTML, NotExistingHTMLClass
+from modules.models.exceptions import (NotExistingHTMLClass, UnknownURLError,
+                                       WrongFormatForHTML)
 
 
 @dataclass
 class AssetMappingUpdater:
     """Class for updating assets mapping from scraped data."""
+
     url: str = None
     updated_file: str = None
     html: str = None
