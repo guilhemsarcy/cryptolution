@@ -69,3 +69,39 @@ class AccessDataframeFieldFailure(Exception):
 
     def __str__(self):
         return self.message
+
+
+class UnknownURLError(Exception):
+    """
+    Exception raised when trying to access an unknown URL.
+    """
+
+    def __init__(self, url: str):
+        self.message = f'Error trying to access the URL: {url}'
+
+    def __str__(self):
+        return self.message
+
+
+class WrongFormatForHTML(Exception):
+    """
+    Exception raised when trying to soupify bad formatted html code.
+    """
+
+    def __init__(self):
+        self.message = 'Error trying to soupify html code.'
+
+    def __str__(self):
+        return self.message
+
+
+class NotExistingHTMLClass(Exception):
+    """
+    Exception raised when trying to find element from not existing class.
+    """
+
+    def __init__(self, elem_class: str):
+        self.message = f'Error trying to get element from {elem_class} class.'
+
+    def __str__(self):
+        return self.message

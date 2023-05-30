@@ -28,11 +28,15 @@ def get_historical_market_data() -> pd.DataFrame:
 
 
 data = get_historical_market_data()
-with open('modules/data/pairs.json') as json_pairs:
-    pairs = json.load(json_pairs)
-
 with open('modules/assets_mapping/mapping.json') as json_mapping_file:
     asset_name_mapping = json.load(json_mapping_file)
+with open('modules/data/pairs.json') as json_pairs:
+    pairs = json.load(json_pairs)
+    pairs = {
+        p: pairs[p]
+        for p in pairs
+        if pairs[p]['asset'] in asset_name_mapping
+    }
 
 cryptolution_view = CryptolutionView(
     title='Cryptolution',

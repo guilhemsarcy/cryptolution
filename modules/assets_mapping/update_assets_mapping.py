@@ -1,44 +1,97 @@
 """Script for scrapping explicit names from raw currency codes."""
 import json
+from dataclasses import dataclass
 
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import ResultSet
+
+from modules.models.exceptions import (NotExistingHTMLClass, UnknownURLError,
+                                       WrongFormatForHTML)
 
 
-def update_assets_mapping() -> dict:
+@dataclass
+class AssetMappingUpdater:
+    """Class for updating assets mapping from scraped data."""
+
+    url: str = None
+    updated_file: str = None
+    html: str = None
+    soup: BeautifulSoup = None
+    mapping: dict = None
+
+    def get_html(self):
+        """
+        Retrieve html source code from website url.
+        """
+        try:
+            html = requests.get(url=self.url).text
+        except requests.exceptions.ConnectionError:
+            raise UnknownURLError(self.url)
+        self.html = html
+
+    def soupify_html(self):
+        """
+        Soupify html source code.
+        """
+        soup = BeautifulSoup(self.html, "html.parser")
+        if soup.text == self.html:
+            raise WrongFormatForHTML
+        self.soup = soup
+
+    def build_mapping(self, table: ResultSet):
+        """
+        Build mapping from scraping.
+        """
+        lst = []
+        for row in table[1:]:  # skip the header
+            lst.append(
+                {
+                    "symbol": row.find(class_="left noWrap elp symb js-currency-symbol")["title"],
+                    "name": row.find(class_="left bold elp name cryptoName first js-currency-name")["title"]
+                }
+            )
+
+        self.mapping = {
+            item['symbol']: item['name']
+            for item in lst
+        }
+
+    @staticmethod
+    def find_from_soup(elem: BeautifulSoup, elem_class: str) -> BeautifulSoup:
+        """
+        Find element from soup object.
+
+        :param elem: html element of interest
+        :param elem_class: class to look for
+
+        :return: soup object of interest
+        """
+        res = elem.find(class_=elem_class)
+        if res is None:
+            raise NotExistingHTMLClass(elem_class)
+        return res
+
+
+def get_assets_mapping() -> dict:
     """
-    Scrap coinmarketcap.com and get labels associated to currency codes.
+    Scrap investing.com and get labels associated to currency symbols.
 
     :return: a mapping between currency code and label
     """
-    res = requests.get("https://coinmarketcap.com/all/views/all/")
-    res.raise_for_status()
+    mapping_updater = AssetMappingUpdater(
+        url="https://www.investing.com/crypto/currencies",
+        updated_file="mapping.json"
+    )
+    mapping_updater.get_html()
+    mapping_updater.soupify_html()
 
-    soup = BeautifulSoup(res.text, "html.parser")
-    table = soup.find_all('table')[2]
-
-    rows = list()
-    for row in table.findAll("tr")[1:]:
-        rows.append(row)
-
-    mp = {}
-    for r in rows:
-        value = r.find_all('td')
-        mp[value[2].text] = value[1].text
-
-    # tweaks
-    mp['TBTC'] = 'Bitcoin'
-    mp['XBT'] = 'Bitcoin'
-    mp['REPV2'] = mp['REP']
-    del mp['REP']
-    mp['XDG'] = mp['DOGE']
-    del mp['DOGE']
-    mp['MLN'] = 'Melon'
-    mp['PAXG'] = 'Pax gold'
-    return mp
+    data = mapping_updater.soup.find_all('tr')
+    mapping_updater.build_mapping(table=data)
+    return mapping_updater.mapping
 
 
 if __name__ == '__main__':
-    mapping = update_assets_mapping()
+    mapping = get_assets_mapping()
     with open('mapping.json', 'w') as jsn:
         json.dump(mapping, jsn, sort_keys=True, indent=4)
